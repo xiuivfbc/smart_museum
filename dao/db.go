@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"group_ten_server/model"
 	"log"
 
 	"gorm.io/driver/mysql"
@@ -18,6 +19,15 @@ func InitDB() {
 	}
 	log.Println("数据库连接成功")
 	db = database
+
+	// 自动迁移所有模型表结构
+	err = db.AutoMigrate(
+		&model.User{},
+		&model.Environment{},
+	)
+	if err != nil {
+		log.Fatalf("自动迁移表结构失败: %v", err)
+	}
 }
 
 // GetDB 获取数据库实例
