@@ -8,7 +8,6 @@ import (
 // main 作为程序入口，只负责启动服务和调用路由
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
-	my_init.InitAll()
 	port := my_init.GetServerPort()
 	r := my_init.SetupRouter()
 

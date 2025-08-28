@@ -7,7 +7,7 @@ import (
 	"group_ten_server/service"
 )
 
-func InitAll() {
+func init() {
 	config.InitConfig()
 	middleware.InitJwtKey(config.Conf.GetString("gin.jwt_secret"))
 	controller.InitJwtKey(config.Conf.GetString("gin.jwt_secret"))
