@@ -11,9 +11,12 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtKey = []byte("your_secret_key")
+var jwtKey []byte
 
-// UserClaims 用于JWT
+func InitJwtKey(key string) {
+	jwtKey = []byte(key)
+} // UserClaims 用于JWT
+
 type UserClaims struct {
 	UserID   int    `json:"user_id"`
 	Username string `json:"username"`

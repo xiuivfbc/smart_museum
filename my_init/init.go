@@ -1,0 +1,15 @@
+package my_init
+
+import (
+	"group_ten_server/config"
+	"group_ten_server/controller"
+	"group_ten_server/middleware"
+	"group_ten_server/service"
+)
+
+func InitAll() {
+	config.InitConfig()
+	middleware.InitJwtKey(config.Conf.GetString("gin.jwt_secret"))
+	controller.InitJwtKey(config.Conf.GetString("gin.jwt_secret"))
+	service.InitMQTT()
+}

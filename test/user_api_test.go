@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"group_ten_server/router"
+	"group_ten_server/my_init"
 )
 
 type UserReq struct {
@@ -17,7 +17,7 @@ type UserReq struct {
 }
 
 func TestUserRegisterAndLogin(t *testing.T) {
-	r := router.SetupRouter()
+	r := my_init.SetupRouter()
 
 	// 1. 注册用户
 	register := UserReq{

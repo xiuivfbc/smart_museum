@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"group_ten_server/router"
+	"group_ten_server/my_init"
 )
 
 type EnvReq struct {
@@ -21,7 +21,7 @@ type EnvReq struct {
 }
 
 func TestEnvironmentAPI(t *testing.T) {
-	r := router.SetupRouter()
+	r := my_init.SetupRouter()
 
 	// 1. 创建环境
 	create := EnvReq{

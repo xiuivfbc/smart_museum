@@ -1,4 +1,4 @@
-package router
+package my_init
 
 import (
 	"group_ten_server/controller"
