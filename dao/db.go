@@ -24,6 +24,7 @@ func InitDB() {
 	err = db.AutoMigrate(
 		&model.User{},
 		&model.Environment{},
+		&model.ActivationCode{},
 	)
 	if err != nil {
 		log.Fatalf("自动迁移表结构失败: %v", err)

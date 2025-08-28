@@ -6,11 +6,20 @@ import (
 	"gorm.io/gorm"
 )
 
-// GetUserByUsername 根据用户名查找用户
-func GetUserByUsername(username string) (*model.User, error) {
-	db := GetDB()
+// GetUserByPhone 根据电话查找用户
+func GetUserByPhone(phone string) (*model.User, error) {
 	var user model.User
-	err := db.Where("username = ?", username).First(&user).Error
+	err := db.Where("phone = ?", phone).First(&user).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+	return &user, err
+}
+
+// GetUserByEmail 根据邮箱查找用户
+func GetUserByEmail(email string) (*model.User, error) {
+	var user model.User
+	err := db.Where("email = ?", email).First(&user).Error
 	if err == gorm.ErrRecordNotFound {
 		return nil, nil
 	}
@@ -19,6 +28,5 @@ func GetUserByUsername(username string) (*model.User, error) {
 
 // CreateUser 创建新用户
 func CreateUser(user *model.User) error {
-	db := GetDB()
 	return db.Create(user).Error
 }

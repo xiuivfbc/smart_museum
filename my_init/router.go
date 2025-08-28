@@ -2,7 +2,6 @@ package my_init
 
 import (
 	"group_ten_server/controller"
-	"group_ten_server/dao"
 
 	"github.com/gin-contrib/cors"
 
@@ -11,11 +10,6 @@ import (
 
 // SetupRouter 初始化Gin路由
 func SetupRouter() *gin.Engine {
-	// 数据库连接配置
-	// 初始化数据库连接
-	dao.InitDB()
-	// 可通过 dao.GetDB() 获取 *sql.DB 实例
-
 	//设置路由
 	r := gin.Default()
 	r.Use(cors.Default())

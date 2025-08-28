@@ -13,7 +13,7 @@ func InitConfig() {
 	Conf = viper.New()
 	Conf.SetConfigName("config")
 	Conf.SetConfigType("yaml")
-	Conf.AddConfigPath("./config")
+	Conf.AddConfigPath("../config")
 	err := Conf.ReadInConfig()
 	if err != nil {
 		log.Fatalf("读取配置文件失败: %v", err)
