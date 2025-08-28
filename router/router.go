@@ -1,9 +1,10 @@
 package router
 
 import (
-	"github.com/gin-contrib/cors"
 	"group_ten_server/controller"
 	"group_ten_server/dao"
+
+	"github.com/gin-contrib/cors"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,6 +23,16 @@ func SetupRouter() *gin.Engine {
 	{
 		user.POST("/register", controller.Register)
 		user.POST("/login", controller.Login)
+	}
+
+	// 环境数据相关路由
+	env := r.Group("/environments")
+	{
+		env.POST("", controller.CreateEnvironment)
+		env.GET("", controller.GetAllEnvironments)
+		env.GET(":name", controller.GetEnvironmentByName)
+		env.PUT(":name", controller.UpdateEnvironmentByName)
+		env.DELETE(":name", controller.DeleteEnvironmentByName)
 	}
 	return r
 }

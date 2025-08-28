@@ -6,6 +6,7 @@ package model
 
 type Environment struct {
 	ID       int     `json:"id" gorm:"primaryKey"` // 编号
+	Name     string  `json:"name" gorm:"unique"`   // 环境名称，唯一
 	Temp     float64 `json:"temp"`                 // 温度
 	Humidity float64 `json:"humidity"`             // 湿度
 	Status   string  `json:"status"`               // 状态

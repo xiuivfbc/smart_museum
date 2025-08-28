@@ -22,11 +22,11 @@ func CreateEnvironment(env *model.Environment) error {
 	return db.Create(env).Error
 }
 
-// GetEnvironmentByID 根据编号查询环境数据
-func GetEnvironmentByID(id int) (*model.Environment, error) {
+// GetEnvironmentByName 根据名称查询环境数据
+func GetEnvironmentByName(name string) (*model.Environment, error) {
 	db := GetDB()
 	var env model.Environment
-	err := db.First(&env, id).Error
+	err := db.Where("name = ?", name).First(&env).Error
 	return &env, err
 }
 
@@ -38,14 +38,14 @@ func GetAllEnvironments() ([]model.Environment, error) {
 	return envs, err
 }
 
-// UpdateEnvironment 更新环境数据
-func UpdateEnvironment(env *model.Environment) error {
+// UpdateEnvironmentByName 根据name更新环境数据
+func UpdateEnvironmentByName(name string, update *model.Environment) error {
 	db := GetDB()
-	return db.Save(env).Error
+	return db.Model(&model.Environment{}).Where("name = ?", name).Updates(update).Error
 }
 
-// DeleteEnvironment 删除环境数据
-func DeleteEnvironment(id int) error {
+// DeleteEnvironmentByName 根据name删除环境数据
+func DeleteEnvironmentByName(name string) error {
 	db := GetDB()
-	return db.Delete(&model.Environment{}, id).Error
+	return db.Where("name = ?", name).Delete(&model.Environment{}).Error
 }
