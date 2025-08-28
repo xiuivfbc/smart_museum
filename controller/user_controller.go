@@ -45,12 +45,12 @@ func Register(c *gin.Context) {
 		Email      string `json:"email"`
 		Identifier string `json:"identifier"` // admin验证码
 	}
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
 		return
 	}
-	if !isValidUserInput(req.Username) || !isValidUserInput(req.Password) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "用户名、密码不能为空且不能包含空格"})
+	if !isValidUserInput(req.Password) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "密码不能为空且不能包含空格"})
 		return
 	}
 	if strings.TrimSpace(req.Phone) == "" && strings.TrimSpace(req.Email) == "" {
@@ -62,7 +62,6 @@ func Register(c *gin.Context) {
 		return
 	} else {
 		dao.DeleteActivationCode(req.Identifier)
-		dao.AddActivationCode()
 	}
 	// 检查电话唯一
 	if req.Phone != "" {

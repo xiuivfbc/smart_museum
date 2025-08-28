@@ -25,6 +25,7 @@ func InitDB() {
 		&model.User{},
 		&model.Environment{},
 		&model.ActivationCode{},
+		&model.Ticket{},
 	)
 	if err != nil {
 		log.Fatalf("自动迁移表结构失败: %v", err)

@@ -28,5 +28,13 @@ func SetupRouter() *gin.Engine {
 		env.PUT(":name", controller.UpdateEnvironmentByName)
 		env.DELETE(":name", controller.DeleteEnvironmentByName)
 	}
+
+	ticket := r.Group("/ticket")
+	{
+		ticket.POST("/create", controller.CreateTicket)
+		ticket.GET("/list", controller.ListTickets)
+		ticket.DELETE("/delete", controller.DeleteTicket)
+		ticket.PUT("/update", controller.UpdateTicket)
+	}
 	return r
 }

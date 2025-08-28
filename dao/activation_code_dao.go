@@ -24,19 +24,6 @@ func DeleteActivationCode(code string) error {
 	return db.Delete(&model.ActivationCode{}, "code = ?", code).Error
 }
 
-// CountActivationCodes 获取当前激活码数量
-func CountActivationCodes() (int64, error) {
-	var count int64
-	err := db.Model(&model.ActivationCode{}).Count(&count).Error
-	return count, err
-}
-
-// AddActivationCode 添加新激活码
-func AddActivationCode() error {
-	code := model.GenerateActivationCode()
-	return db.Create(&model.ActivationCode{Code: code}).Error
-}
-
 // EnsureActivationCodes 保证激活码数量为5，不足则补充
 func EnsureActivationCodes() error {
 	count, err := CountActivationCodes()
@@ -63,4 +50,17 @@ func EnsureActivationCodes() error {
 		}
 	}
 	return nil
+}
+
+// AddActivationCode 添加新激活码
+func AddActivationCode() error {
+	code := model.GenerateActivationCode()
+	return db.Create(&model.ActivationCode{Code: code}).Error
+}
+
+// CountActivationCodes 获取当前激活码数量
+func CountActivationCodes() (int64, error) {
+	var count int64
+	err := db.Model(&model.ActivationCode{}).Count(&count).Error
+	return count, err
 }
