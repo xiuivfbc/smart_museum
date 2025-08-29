@@ -154,7 +154,7 @@ func UploadUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
 		return
 	}
-	// 查询用户
+	// 查询用户qfda
 	user := &model.User{}
 	db := dao.GetDB()
 	if err := db.First(user, req.Id).Error; err != nil {

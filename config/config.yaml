@@ -9,3 +9,6 @@ gin:
 
 server:
   path: C:\Users\31389\Desktop\group-ten-server
+
+mysql:
+  dsn: root:123456@tcp(127.0.0.1:3306)/blog?charset=utf8mb4&parseTime=True&loc=Local
