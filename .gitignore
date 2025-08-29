@@ -2,3 +2,4 @@
 bin/
 *.log
 .env
+.qrcodes/

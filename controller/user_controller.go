@@ -138,7 +138,7 @@ func LoginUser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "生成token失败"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"token": tokenString, "id": user.ID})
+	c.JSON(http.StatusOK, gin.H{"message": "登录成功", "token": tokenString, "id": user.ID, "userform": user})
 }
 
 func UploadUser(c *gin.Context) {

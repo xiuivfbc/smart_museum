@@ -6,5 +6,6 @@ import "time"
 
 type Ticket struct {
 	ID   int       `json:"id" gorm:"primaryKey"` // 用户唯一ID
+	Path string    `json:"path"`                 // 路径
 	Time time.Time `json:"time"`                 // 更新时间
 }

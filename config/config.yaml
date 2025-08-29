@@ -3,5 +3,9 @@ mqtt:
   client_id: cp
 
 gin:
-  jwt_secret: group_nine_is_most_nb_666
+  ip: 127.0.0.1
   port: 8080
+  jwt_secret: group_nine_is_most_nb_666
+
+server:
+  path: C:\Users\31389\Desktop\group-ten-server

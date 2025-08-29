@@ -33,9 +33,10 @@ func SetupRouter() *gin.Engine {
 	ticket := r.Group("/ticket")
 	{
 		ticket.POST("/create", controller.CreateTicket)
-		ticket.GET("/list", controller.ListTickets)
+		ticket.GET("/list", controller.ListTicket)
 		ticket.DELETE("/delete", controller.DeleteTicket)
 		ticket.PUT("/update", controller.UpdateTicket)
+		ticket.GET("/use", controller.UseTicket)
 	}
 	return r
 }
