@@ -36,7 +36,7 @@ func isValidUserInput(s string) bool {
 }
 
 // Register 用户注册
-func Register(c *gin.Context) {
+func RegisterUser(c *gin.Context) {
 	var req struct {
 		Username   string `json:"username"`
 		Password   string `json:"password"`
@@ -99,7 +99,7 @@ func Register(c *gin.Context) {
 }
 
 // Login 用户登录
-func Login(c *gin.Context) {
+func LoginUser(c *gin.Context) {
 	var req struct {
 		Identifier string `json:"identifier"` // 电话或邮箱
 		Password   string `json:"password"`
@@ -138,5 +138,55 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "生成token失败"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"token": tokenString})
+	c.JSON(http.StatusOK, gin.H{"token": tokenString, "id": user.ID})
+}
+
+func UploadUser(c *gin.Context) {
+	var req struct {
+		Id          int    `json:"id"`
+		Username    string `json:"username"`
+		Phone       string `json:"phone"`
+		Email       string `json:"email"`
+		Password    string `json:"password"`
+		NewPassword string `json:"new_password"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
+		return
+	}
+	// 查询用户
+	user := &model.User{}
+	db := dao.GetDB()
+	if err := db.First(user, req.Id).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "用户不存在"})
+		return
+	}
+	// 校验密码
+	if user.Password != req.Password {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "密码错误"})
+		return
+	}
+	// 更新信息
+	update := map[string]any{}
+	if req.Username != "" {
+		update["username"] = req.Username
+	}
+	if req.Phone != "" {
+		update["phone"] = req.Phone
+	}
+	if req.Email != "" {
+		update["email"] = req.Email
+	}
+	if req.NewPassword != "" {
+		update["password"] = req.NewPassword
+	}
+	if len(update) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "无可更新字段"})
+		return
+	}
+	if err := db.Model(user).Updates(update).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "更新失败"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "更新成功"})
 }

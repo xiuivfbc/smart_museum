@@ -15,8 +15,9 @@ func SetupRouter() *gin.Engine {
 	r.Use(cors.Default())
 	user := r.Group("/auth")
 	{
-		user.POST("/register", controller.Register)
-		user.POST("/login", controller.Login)
+		user.POST("/register", controller.RegisterUser)
+		user.POST("/login", controller.LoginUser)
+		user.POST("/upload", controller.UploadUser)
 	}
 
 	// 环境数据相关路由
