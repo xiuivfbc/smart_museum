@@ -27,13 +27,13 @@ func CreateTicket(c *gin.Context) {
 	}
 	userID, err := dao.GetUserIDByEmailOrPhone(req.Identifier)
 	if err != nil || userID == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "用户不存在"})
+		c.JSON(http.StatusOK, gin.H{"error": "用户不存在"})
 		return
 	}
 	// 解析时间
 	t, err := time.Parse(time.RFC3339, req.Time)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "时间格式错误，需为RFC3339格式"})
+		c.JSON(http.StatusOK, gin.H{"error": "时间格式错误，需为RFC3339格式"})
 		return
 	}
 	// 生成二维码，内容为 userID,time
@@ -64,12 +64,12 @@ func CreateTicket(c *gin.Context) {
 func ListTicket(c *gin.Context) {
 	identifier := c.Query("identifier")
 	if identifier == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "缺少identifier参数"})
+		c.JSON(http.StatusOK, gin.H{"error": "缺少identifier参数"})
 		return
 	}
 	userID, err := dao.GetUserIDByEmailOrPhone(identifier)
 	if err != nil || userID == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "用户不存在"})
+		c.JSON(http.StatusOK, gin.H{"error": "用户不存在"})
 		return
 	}
 	tickets, err := dao.ListTickets()
@@ -90,12 +90,12 @@ func ListTicket(c *gin.Context) {
 func DeleteTicket(c *gin.Context) {
 	identifier := c.Query("identifier")
 	if identifier == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "缺少identifier参数"})
+		c.JSON(http.StatusOK, gin.H{"error": "缺少identifier参数"})
 		return
 	}
 	userID, err := dao.GetUserIDByEmailOrPhone(identifier)
 	if err != nil || userID == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "用户不存在"})
+		c.JSON(http.StatusOK, gin.H{"error": "用户不存在"})
 		return
 	}
 	if err := dao.DeleteTicketByID(userID); err != nil {
@@ -116,12 +116,12 @@ func UpdateTicket(c *gin.Context) {
 	}
 	userID, err := dao.GetUserIDByEmailOrPhone(req.Identifier)
 	if err != nil || userID == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "用户不存在"})
+		c.JSON(http.StatusOK, gin.H{"error": "用户不存在"})
 		return
 	}
 	t, err := time.Parse(time.RFC3339, req.Time)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "时间格式错误，需为RFC3339格式"})
+		c.JSON(http.StatusOK, gin.H{"error": "时间格式错误，需为RFC3339格式"})
 		return
 	}
 	ticket := model.Ticket{

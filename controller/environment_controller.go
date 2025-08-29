@@ -26,12 +26,12 @@ func CreateEnvironment(c *gin.Context) {
 func GetEnvironmentByName(c *gin.Context) {
 	name := c.Param("name")
 	if name == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "name不能为空"})
+		c.JSON(http.StatusOK, gin.H{"error": "name不能为空"})
 		return
 	}
 	env, err := dao.GetEnvironmentByName(name)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "未找到"})
+		c.JSON(http.StatusOK, gin.H{"error": "未找到"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"data": env})
@@ -66,7 +66,7 @@ func UpdateEnvironmentByName(c *gin.Context) {
 func DeleteEnvironmentByName(c *gin.Context) {
 	name := c.Param("name")
 	if name == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "name不能为空"})
+		c.JSON(http.StatusOK, gin.H{"error": "name不能为空"})
 		return
 	}
 	if err := dao.DeleteEnvironmentByName(name); err != nil {

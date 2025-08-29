@@ -50,15 +50,15 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 	if !isValidUserInput(req.Password) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "密码不能为空且不能包含空格"})
+		c.JSON(http.StatusOK, gin.H{"error": "密码不能为空且不能包含空格"})
 		return
 	}
 	if strings.TrimSpace(req.Phone) == "" && strings.TrimSpace(req.Email) == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "电话和邮箱至少填写一个"})
+		c.JSON(http.StatusOK, gin.H{"error": "电话和邮箱至少填写一个"})
 		return
 	}
 	if ok, _ := dao.GetActivationCode(req.Identifier); req.Role == "admin" && !ok {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "无效的管理员激活码"})
+		c.JSON(http.StatusOK, gin.H{"error": "无效的管理员激活码"})
 		return
 	} else {
 		dao.DeleteActivationCode(req.Identifier)
@@ -68,7 +68,7 @@ func RegisterUser(c *gin.Context) {
 		var user model.User
 		db := dao.GetDB()
 		if err := db.Where("phone = ?", req.Phone).First(&user).Error; err == nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "电话已被注册"})
+			c.JSON(http.StatusOK, gin.H{"error": "电话已被注册"})
 			return
 		}
 	}
@@ -77,7 +77,7 @@ func RegisterUser(c *gin.Context) {
 		var user model.User
 		db := dao.GetDB()
 		if err := db.Where("email = ?", req.Email).First(&user).Error; err == nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "邮箱已被注册"})
+			c.JSON(http.StatusOK, gin.H{"error": "邮箱已被注册"})
 			return
 		}
 	}
@@ -109,7 +109,7 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 	if strings.TrimSpace(req.Identifier) == "" || !isValidUserInput(req.Password) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "账号和密码不能为空且不能包含空格"})
+		c.JSON(http.StatusOK, gin.H{"error": "账号和密码不能为空且不能包含空格"})
 		return
 	}
 	var user *model.User
@@ -120,7 +120,7 @@ func LoginUser(c *gin.Context) {
 		user, err = dao.GetUserByPhone(req.Identifier)
 	}
 	if err != nil || user == nil || user.Password != req.Password {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "账号或密码错误"})
+		c.JSON(http.StatusOK, gin.H{"error": "账号或密码错误"})
 		return
 	}
 	// 生成JWT
@@ -158,12 +158,12 @@ func UploadUser(c *gin.Context) {
 	user := &model.User{}
 	db := dao.GetDB()
 	if err := db.First(user, req.Id).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "用户不存在"})
+		c.JSON(http.StatusOK, gin.H{"error": "用户不存在"})
 		return
 	}
 	// 校验密码
 	if user.Password != req.Password {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "密码错误"})
+		c.JSON(http.StatusOK, gin.H{"error": "密码错误"})
 		return
 	}
 	// 更新信息
@@ -181,7 +181,7 @@ func UploadUser(c *gin.Context) {
 		update["password"] = req.NewPassword
 	}
 	if len(update) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "无可更新字段"})
+		c.JSON(http.StatusOK, gin.H{"error": "无可更新字段"})
 		return
 	}
 	if err := db.Model(user).Updates(update).Error; err != nil {
