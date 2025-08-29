@@ -52,7 +52,7 @@ func CreateTicket(c *gin.Context) {
 	ticket := model.Ticket{
 		ID:   userID,
 		Time: t,
-		Path: path,
+		Path: fileName,
 	}
 	if err := dao.CreateTicket(&ticket); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "创建失败"})
