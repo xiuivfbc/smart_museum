@@ -18,28 +18,26 @@ import (
 
 func CreateTicket(c *gin.Context) {
 	var req struct {
-		Identifier string `json:"identifier"` // 邮箱或电话
-		Time       string `json:"time"`       // 时间字符串
+		ID   int    `json:"id"`
+		Time string `json:"time"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
 		return
 	}
-	userID, err := dao.GetUserIDByEmailOrPhone(req.Identifier)
-	if err != nil || userID == 0 {
-		c.JSON(http.StatusOK, gin.H{"error": "用户不存在"})
+	if req.ID == 0 {
+		c.JSON(http.StatusOK, gin.H{"error": "缺少id参数"})
 		return
 	}
-	// 解析时间
 	t, err := time.Parse(time.RFC3339, req.Time)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"error": "时间格式错误，需为RFC3339格式"})
 		return
 	}
-	// 生成二维码，内容为 userID,time
+	// 生成二维码，内容为 id,time
 	saveDir := config.Conf.GetString("server.path") + "/qrcodes"
-	content := "http://" + config.Conf.GetString("gin.ip") + ":" + config.Conf.GetString("gin.port") + "/ticket/use?ticket_id=" + strconv.Itoa(userID)
-	fileName := fmt.Sprintf("qrcode_%d.png", userID)
+	content := "http://" + config.Conf.GetString("gin.ip") + ":" + config.Conf.GetString("gin.port") + "/ticket/use?ticket_id=" + strconv.Itoa(req.ID)
+	fileName := fmt.Sprintf("qrcode_%d.png", req.ID)
 	path := filepath.Join(saveDir, fileName)
 	if err := os.MkdirAll(saveDir, 0755); err != nil {
 		log.Println("创建目录失败:", err)
@@ -50,7 +48,7 @@ func CreateTicket(c *gin.Context) {
 		return
 	}
 	ticket := model.Ticket{
-		ID:   userID,
+		ID:   req.ID,
 		Time: t,
 		Path: fileName,
 	}
@@ -62,43 +60,38 @@ func CreateTicket(c *gin.Context) {
 }
 
 func ListTicket(c *gin.Context) {
-	identifier := c.Query("identifier")
-	if identifier == "" {
-		c.JSON(http.StatusOK, gin.H{"error": "缺少identifier参数"})
+	var req struct {
+		ID int `json:"id"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
 		return
 	}
-	userID, err := dao.GetUserIDByEmailOrPhone(identifier)
-	if err != nil || userID == 0 {
-		c.JSON(http.StatusOK, gin.H{"error": "用户不存在"})
+	if req.ID == 0 {
+		c.JSON(http.StatusOK, gin.H{"error": "缺少id参数"})
 		return
 	}
-	tickets, err := dao.ListTickets()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "查询失败"})
+	ticket, err := dao.GetTicketByID(req.ID)
+	if err != nil || ticket == nil {
+		c.JSON(http.StatusOK, gin.H{"error": "未找到该ticket"})
 		return
 	}
-	// 只返回该用户的ticket
-	var userTickets []model.Ticket
-	for _, t := range tickets {
-		if t.ID == userID {
-			userTickets = append(userTickets, t)
-		}
-	}
-	c.JSON(http.StatusOK, gin.H{"tickets": userTickets})
+	c.JSON(http.StatusOK, gin.H{"ticket": ticket})
 }
 
 func DeleteTicket(c *gin.Context) {
-	identifier := c.Query("identifier")
-	if identifier == "" {
-		c.JSON(http.StatusOK, gin.H{"error": "缺少identifier参数"})
+	var req struct {
+		ID int `json:"id"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
 		return
 	}
-	userID, err := dao.GetUserIDByEmailOrPhone(identifier)
-	if err != nil || userID == 0 {
-		c.JSON(http.StatusOK, gin.H{"error": "用户不存在"})
+	if req.ID == 0 {
+		c.JSON(http.StatusOK, gin.H{"error": "缺少id参数"})
 		return
 	}
-	if err := dao.DeleteTicketByID(userID); err != nil {
+	if err := dao.DeleteTicketByID(req.ID); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "删除失败"})
 		return
 	}
@@ -107,16 +100,15 @@ func DeleteTicket(c *gin.Context) {
 
 func UpdateTicket(c *gin.Context) {
 	var req struct {
-		Identifier string `json:"identifier"`
-		Time       string `json:"time"`
+		ID   int    `json:"id"`
+		Time string `json:"time"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
 		return
 	}
-	userID, err := dao.GetUserIDByEmailOrPhone(req.Identifier)
-	if err != nil || userID == 0 {
-		c.JSON(http.StatusOK, gin.H{"error": "用户不存在"})
+	if req.ID == 0 {
+		c.JSON(http.StatusOK, gin.H{"error": "缺少id参数"})
 		return
 	}
 	t, err := time.Parse(time.RFC3339, req.Time)
@@ -125,7 +117,7 @@ func UpdateTicket(c *gin.Context) {
 		return
 	}
 	ticket := model.Ticket{
-		ID:   userID,
+		ID:   req.ID,
 		Time: t,
 	}
 	if err := dao.UpdateTicket(&ticket); err != nil {
@@ -153,7 +145,6 @@ func UseTicket(c *gin.Context) {
 	id := c.Query("ticket_id")
 	ticket_id, _ := strconv.Atoi(id)
 	// 删除二维码图片
-	log.Println("ticket_id:", ticket_id)
 	saveDir := config.Conf.GetString("server.path") + "/qrcodes"
 	fileName := fmt.Sprintf("qrcode_%d.png", ticket_id)
 	qrPath := filepath.Join(saveDir, fileName)

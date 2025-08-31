@@ -58,7 +58,7 @@ func RegisterUser(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"error": "电话和邮箱至少填写一个"})
 		return
 	}
-	if !IsValidEmail(req.Email) {
+	if req.Email != "" && !IsValidEmail(req.Email) {
 		c.JSON(http.StatusOK, gin.H{"error": "邮箱格式不正确"})
 		return
 	}
