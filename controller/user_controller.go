@@ -4,6 +4,7 @@ import (
 	"group_ten_server/dao"
 	"group_ten_server/model"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
@@ -55,6 +56,10 @@ func RegisterUser(c *gin.Context) {
 	}
 	if strings.TrimSpace(req.Phone) == "" && strings.TrimSpace(req.Email) == "" {
 		c.JSON(http.StatusOK, gin.H{"error": "电话和邮箱至少填写一个"})
+		return
+	}
+	if !IsValidEmail(req.Email) {
+		c.JSON(http.StatusOK, gin.H{"error": "邮箱格式不正确"})
 		return
 	}
 	if ok, _ := dao.GetActivationCode(req.Identifier); req.Role == "admin" && !ok {
@@ -175,6 +180,10 @@ func UploadUser(c *gin.Context) {
 		update["phone"] = req.Phone
 	}
 	if req.Email != "" {
+		if !IsValidEmail(req.Email) {
+			c.JSON(http.StatusOK, gin.H{"error": "邮箱格式不正确"})
+			return
+		}
 		update["email"] = req.Email
 	}
 	if req.NewPassword != "" {
@@ -189,4 +198,9 @@ func UploadUser(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "更新成功"})
+}
+
+func IsValidEmail(email string) bool {
+	re := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$`)
+	return re.MatchString(email)
 }
