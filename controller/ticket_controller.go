@@ -135,6 +135,20 @@ func UpdateTicket(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "更新成功", "ticket": ticket})
 }
 
+func GetTodayEntryCount(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"count": config.EntryNum})
+}
+
+func GetAllEntryCounts(c *gin.Context) {
+	counts, err := dao.GetAllEntryCounts()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "查询失败"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"data": counts})
+
+}
+
 func UseTicket(c *gin.Context) {
 	id := c.Query("ticket_id")
 	ticket_id, _ := strconv.Atoi(id)
@@ -151,5 +165,6 @@ func UseTicket(c *gin.Context) {
 		log.Println("删除票失败:", err)
 		return
 	}
+	config.EntryNum++
 	c.File(config.Conf.GetString("server.path"))
 }

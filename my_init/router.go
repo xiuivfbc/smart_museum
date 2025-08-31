@@ -3,6 +3,7 @@ package my_init
 import (
 	"group_ten_server/config"
 	"group_ten_server/controller"
+	"group_ten_server/middleware"
 
 	"github.com/gin-contrib/cors"
 
@@ -23,7 +24,6 @@ func SetupRouter() *gin.Engine {
 		user.POST("/upload", controller.UploadUser)
 	}
 
-	// 环境数据相关路由
 	env := r.Group("/environments")
 	{
 		env.GET("", controller.GetAllEnvironmentsByRoom)
@@ -32,15 +32,19 @@ func SetupRouter() *gin.Engine {
 	}
 
 	ticket := r.Group("/ticket")
+	ticket.Use(middleware.JWTAuthMiddleware())
 	{
 		ticket.POST("/create", controller.CreateTicket)
 		ticket.GET("/list", controller.ListTicket)
 		ticket.DELETE("/delete", controller.DeleteTicket)
 		ticket.PUT("/update", controller.UpdateTicket)
 		ticket.GET("/use", controller.UseTicket)
+		ticket.GET("/entrycount/now", controller.GetTodayEntryCount)
+		ticket.GET("/entrycount/all", controller.GetAllEntryCounts)
 	}
 
 	device := r.Group("/device")
+	device.Use(middleware.JWTAuthMiddleware())
 	{
 		device.GET("/get", controller.GetDeviceControl)
 		device.POST("/update", controller.UpdateDeviceControl)

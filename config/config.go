@@ -12,7 +12,8 @@ type AppConfig struct {
 
 var Conf *viper.Viper
 var AppConfigInstance AppConfig
-var DeviceControl string
+var DeviceControl string = "000"
+var EntryNum int = 0
 
 // InitConfig 初始化配置文件读取
 func InitConfig() {

@@ -16,4 +16,5 @@ func init() {
 	dao.InitDB()
 	dao.EnsureActivationCodes()
 	CollectDataFromHardware(config.Conf.GetString("mqtt.environment_topic"))
+	StartDailyEntryCountJob()
 }

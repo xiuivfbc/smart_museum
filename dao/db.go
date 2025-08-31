@@ -27,6 +27,7 @@ func InitDB() {
 		&model.Environment{},
 		&model.ActivationCode{},
 		&model.Ticket{},
+		&model.Daily{},
 	); err != nil {
 		log.Fatalf("自动迁移表失败: %v", err)
 	}
