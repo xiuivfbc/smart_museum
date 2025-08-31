@@ -2,8 +2,8 @@ mqtt:
   broker: 8.156.78.153:1883
   client_id: cp
   client_password: cp123456
-  environment_topic: enviroment
-  device_topic: device
+  environment_topic: museum
+  device_topic: controller
 
 gin:
   ip: 127.0.0.1

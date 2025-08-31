@@ -117,9 +117,11 @@ func UpdateTicket(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"error": "时间格式错误，需为RFC3339格式"})
 		return
 	}
+	fileName := fmt.Sprintf("qrcode_%d.png", req.ID)
 	ticket := model.Ticket{
 		ID:   req.ID,
 		Time: t,
+		Path: fileName,
 	}
 	if err := dao.UpdateTicket(&ticket); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "更新失败"})
