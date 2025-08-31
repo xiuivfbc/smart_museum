@@ -151,5 +151,5 @@ func UseTicket(c *gin.Context) {
 		log.Println("删除票失败:", err)
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "验证成功，欢迎"})
+	c.File(config.Conf.GetString("server.path"))
 }

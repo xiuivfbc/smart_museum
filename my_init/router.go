@@ -39,5 +39,11 @@ func SetupRouter() *gin.Engine {
 		ticket.PUT("/update", controller.UpdateTicket)
 		ticket.GET("/use", controller.UseTicket)
 	}
+
+	device := r.Group("/device")
+	{
+		device.GET("/get", controller.GetDeviceControl)
+		device.POST("/update", controller.UpdateDeviceControl)
+	}
 	return r
 }

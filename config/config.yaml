@@ -2,7 +2,8 @@ mqtt:
   broker: 8.156.78.153:1883
   client_id: cp
   client_password: cp123456
-  topic: sensor/data
+  environment_topic: enviroment
+  device_topic: device
 
 gin:
   ip: 127.0.0.1
@@ -20,3 +21,5 @@ room_mapping:
   room2: enviroment2
   room3: enviroment3
   room4: enviroment4
+
+filepath: C:\Users\31389\Desktop\group-ten-server\qrcodes\ok.png
