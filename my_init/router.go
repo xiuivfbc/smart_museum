@@ -17,6 +17,7 @@ func SetupRouter() *gin.Engine {
 	r := gin.Default()
 	r.Use(cors.Default())
 	r.Static("/qrcodes", qrPath)
+	r.GET("/ticket/use", controller.UseTicket)
 	user := r.Group("/auth")
 	{
 		user.POST("/register", controller.RegisterUser)
@@ -38,7 +39,7 @@ func SetupRouter() *gin.Engine {
 		ticket.GET("/list", controller.ListTicket)
 		ticket.DELETE("/delete", controller.DeleteTicket)
 		ticket.PUT("/update", controller.UpdateTicket)
-		ticket.GET("/use", controller.UseTicket)
+
 		ticket.GET("/entrycount/now", controller.GetTodayEntryCount)
 		ticket.GET("/entrycount/all", controller.GetAllEntryCounts)
 	}

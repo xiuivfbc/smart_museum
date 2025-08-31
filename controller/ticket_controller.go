@@ -166,5 +166,5 @@ func UseTicket(c *gin.Context) {
 		return
 	}
 	config.EntryNum++
-	c.File(config.Conf.GetString("server.path"))
+	c.File(config.Conf.GetString("filepath"))
 }
