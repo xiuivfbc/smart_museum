@@ -15,13 +15,19 @@ func GetDeviceControl(c *gin.Context) {
 
 // 更新DeviceControl值
 func UpdateDeviceControl(c *gin.Context) {
-	req := c.Query("value")
-	config.DeviceControl = req
+	var req struct {
+		Value string `json:"value"`
+	}
+	if err := c.ShouldBind(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
+		return
+	}
+	config.DeviceControl = req.Value
 
 	// 向MQTT发布消息
-	topic := config.Conf.GetString("mqtt.topic")
+	topic := config.Conf.GetString("mqtt.device_topic")
 	if topic != "" {
-		err := service.PublishMQTT(topic, req)
+		err := service.PublishMQTT(topic, req.Value)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "MQTT消息发送失败"})
 			return

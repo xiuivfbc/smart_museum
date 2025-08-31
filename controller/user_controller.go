@@ -109,7 +109,7 @@ func LoginUser(c *gin.Context) {
 		Identifier string `json:"identifier"` // 电话或邮箱
 		Password   string `json:"password"`
 	}
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
 		return
 	}
@@ -155,7 +155,7 @@ func UploadUser(c *gin.Context) {
 		Password    string `json:"password"`
 		NewPassword string `json:"new_password"`
 	}
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
 		return
 	}

@@ -11,8 +11,14 @@ import (
 )
 
 func GetLastEnvironmentByRoom(c *gin.Context) {
-	room := c.Query("room")
-	table, ok := config.AppConfigInstance.RoomMapping[room]
+	var req struct {
+		Room string `json:"room"`
+	}
+	if err := c.ShouldBind(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
+		return
+	}
+	table, ok := config.AppConfigInstance.RoomMapping[req.Room]
 	if !ok {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "无效房间名"})
 		return
@@ -26,8 +32,14 @@ func GetLastEnvironmentByRoom(c *gin.Context) {
 }
 
 func GetAllEnvironmentsByRoom(c *gin.Context) {
-	room := c.Query("room")
-	table, ok := config.AppConfigInstance.RoomMapping[room]
+	var req struct {
+		Room string `json:"room"`
+	}
+	if err := c.ShouldBind(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
+		return
+	}
+	table, ok := config.AppConfigInstance.RoomMapping[req.Room]
 	if !ok {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "无效房间名"})
 		return
@@ -53,8 +65,14 @@ func CreateEnvironmentByRoom(room string, env *model.Environment) error {
 }
 
 func DeleteEnvironmentByRoom(c *gin.Context) {
-	room := c.Query("room")
-	table, ok := config.AppConfigInstance.RoomMapping[room]
+	var req struct {
+		Room string `json:"room"`
+	}
+	if err := c.ShouldBind(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
+		return
+	}
+	table, ok := config.AppConfigInstance.RoomMapping[req.Room]
 	if !ok {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "无效房间名"})
 		return

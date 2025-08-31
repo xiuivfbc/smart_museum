@@ -21,7 +21,7 @@ func CreateTicket(c *gin.Context) {
 		ID   int    `json:"id"`
 		Time string `json:"time"`
 	}
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
 		return
 	}
@@ -63,7 +63,7 @@ func ListTicket(c *gin.Context) {
 	var req struct {
 		ID int `json:"id"`
 	}
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
 		return
 	}
@@ -83,7 +83,7 @@ func DeleteTicket(c *gin.Context) {
 	var req struct {
 		ID int `json:"id"`
 	}
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
 		return
 	}
@@ -103,7 +103,7 @@ func UpdateTicket(c *gin.Context) {
 		ID   int    `json:"id"`
 		Time string `json:"time"`
 	}
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
 		return
 	}
