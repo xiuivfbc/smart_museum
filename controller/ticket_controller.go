@@ -67,6 +67,7 @@ func ListTicket(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
 		return
 	}
+	log.Println("ListTicket request:", req)
 	if req.ID == 0 {
 		c.JSON(http.StatusOK, gin.H{"error": "缺少id参数"})
 		return

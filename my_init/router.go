@@ -27,8 +27,8 @@ func SetupRouter() *gin.Engine {
 
 	env := r.Group("/environments")
 	{
-		env.GET("", controller.GetAllEnvironmentsByRoom)
-		env.GET(":name", controller.GetLastEnvironmentByRoom)
+		env.POST("", controller.GetAllEnvironmentsByRoom)
+		env.POST(":name", controller.GetLastEnvironmentByRoom)
 		env.DELETE(":name", controller.DeleteEnvironmentByRoom)
 	}
 
@@ -36,7 +36,7 @@ func SetupRouter() *gin.Engine {
 	ticket.Use(middleware.JWTAuthMiddleware())
 	{
 		ticket.POST("/create", controller.CreateTicket)
-		ticket.GET("/list", controller.ListTicket)
+		ticket.POST("/list", controller.ListTicket)
 		ticket.DELETE("/delete", controller.DeleteTicket)
 		ticket.PUT("/update", controller.UpdateTicket)
 
