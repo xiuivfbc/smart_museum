@@ -15,7 +15,13 @@ func SetupRouter() *gin.Engine {
 	qrPath := config.Conf.GetString("server.path") + "/qrcodes"
 	//设置路由
 	r := gin.Default()
-	r.Use(cors.Default())
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
 	r.Static("/qrcodes", qrPath)
 	r.GET("/ticket/use", controller.UseTicket)
 	user := r.Group("/auth")

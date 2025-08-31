@@ -145,6 +145,14 @@ func GetAllEntryCounts(c *gin.Context) {
 func UseTicket(c *gin.Context) {
 	id := c.Query("ticket_id")
 	ticket_id, _ := strconv.Atoi(id)
+	// 先查票据是否存在
+	ticket, err := dao.GetTicketByID(ticket_id)
+	if err != nil || ticket == nil {
+		// 返回 damie.png
+		damiePath := filepath.Join(config.Conf.GetString("filepath2"))
+		c.File(damiePath)
+		return
+	}
 	// 删除二维码图片
 	saveDir := config.Conf.GetString("server.path") + "/qrcodes"
 	fileName := fmt.Sprintf("qrcode_%d.png", ticket_id)
