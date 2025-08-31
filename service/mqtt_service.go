@@ -1,7 +1,11 @@
 package service
 
 import (
+	"encoding/json"
 	"group_ten_server/config"
+	"group_ten_server/controller"
+	"group_ten_server/model"
+	"log"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 )
@@ -20,12 +24,40 @@ func InitMQTT() {
 	}
 	opts := MQTT.NewClientOptions().AddBroker(broker)
 	opts.SetUsername("cp")
-	opts.SetPassword("cp123456")
+	opts.SetPassword(config.Conf.GetString("mqtt.client_password"))
 	opts.SetClientID(clientID)
 	mqttClient = MQTT.NewClient(opts)
 	if token := mqttClient.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())
 	}
+}
+
+// 从硬件收集数据
+func CollectDataFromHardware(topic string) {
+	go func() {
+		// 只需订阅一次，回调会持续处理
+		err := SubscribeMQTT(topic, func(client MQTT.Client, msg MQTT.Message) {
+			// 先解析出 room 字段
+			var rawData map[string]interface{}
+			json.Unmarshal(msg.Payload(), &rawData)
+			room, ok := rawData["room"].(string)
+			if !ok {
+				log.Println("缺少 room 字段或格式错误")
+				return
+			}
+			delete(rawData, "room")
+			jsonData, _ := json.Marshal(rawData)
+			var env model.Environment
+			if err := json.Unmarshal(jsonData, &env); err != nil {
+				log.Println("解析环境数据失败:", err)
+				return
+			}
+			controller.CreateEnvironmentByRoom(room, &env)
+		})
+		if err != nil {
+			log.Println("订阅主题失败:", err)
+		}
+	}()
 }
 
 // PublishMQTT 发布消息到指定主题

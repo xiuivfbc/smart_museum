@@ -15,4 +15,5 @@ func init() {
 	service.InitMQTT()
 	dao.InitDB()
 	dao.EnsureActivationCodes()
+	service.CollectDataFromHardware(config.Conf.GetString("mqtt.topic"))
 }

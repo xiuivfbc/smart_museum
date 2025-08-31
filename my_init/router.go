@@ -26,11 +26,9 @@ func SetupRouter() *gin.Engine {
 	// 环境数据相关路由
 	env := r.Group("/environments")
 	{
-		env.POST("", controller.CreateEnvironment)
-		env.GET("", controller.GetAllEnvironments)
-		env.GET(":name", controller.GetEnvironmentByName)
-		env.PUT(":name", controller.UpdateEnvironmentByName)
-		env.DELETE(":name", controller.DeleteEnvironmentByName)
+		env.GET("", controller.GetAllEnvironmentsByRoom)
+		env.GET(":name", controller.GetLastEnvironmentByRoom)
+		env.DELETE(":name", controller.DeleteEnvironmentByRoom)
 	}
 
 	ticket := r.Group("/ticket")

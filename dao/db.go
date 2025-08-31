@@ -21,16 +21,32 @@ func InitDB() {
 	log.Println("数据库连接成功")
 	db = database
 
-	// 自动迁移所有模型表结构
-	err = db.AutoMigrate(
+	// 自动迁移模型表结构
+	if err := db.AutoMigrate(
 		&model.User{},
 		&model.Environment{},
 		&model.ActivationCode{},
 		&model.Ticket{},
-	)
-	if err != nil {
-		log.Fatalf("自动迁移表结构失败: %v", err)
+	); err != nil {
+		log.Fatalf("自动迁移表失败: %v", err)
 	}
+
+	// 动态创建表
+	if err := AutoCreateTables(); err != nil {
+		log.Fatalf("动态创建表失败: %v", err)
+	}
+}
+
+func AutoCreateTables() error {
+	for roomName, tableName := range config.AppConfigInstance.RoomMapping {
+		// 创建动态表
+		err := db.Table(tableName).AutoMigrate(&model.Environment{})
+		if err != nil {
+			log.Printf("Failed to create table %s for room %s: %v", tableName, roomName, err)
+			return err
+		}
+	}
+	return nil
 }
 
 // GetDB 获取数据库实例
