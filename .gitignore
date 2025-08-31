@@ -2,4 +2,5 @@
 bin/
 *.log
 .env
-qrcodes/
+qrcodes/*
+!qrcodes/.gitkeep
