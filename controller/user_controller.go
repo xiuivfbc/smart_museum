@@ -62,12 +62,6 @@ func RegisterUser(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"error": "邮箱格式不正确"})
 		return
 	}
-	if ok, _ := dao.GetActivationCode(req.Identifier); req.Role == "admin" && !ok {
-		c.JSON(http.StatusOK, gin.H{"error": "无效的管理员激活码"})
-		return
-	} else {
-		dao.DeleteActivationCode(req.Identifier)
-	}
 	// 检查电话唯一
 	if req.Phone != "" {
 		var user model.User
@@ -85,6 +79,12 @@ func RegisterUser(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{"error": "邮箱已被注册"})
 			return
 		}
+	}
+	if ok, _ := dao.GetActivationCode(req.Identifier); req.Role == "admin" && !ok {
+		c.JSON(http.StatusOK, gin.H{"error": "无效的管理员激活码"})
+		return
+	} else {
+		dao.DeleteActivationCode(req.Identifier)
 	}
 	user := model.User{
 		Username:  req.Username,

@@ -34,8 +34,8 @@ func SetupRouter() *gin.Engine {
 	env := r.Group("/environments")
 	{
 		env.POST("", controller.GetAllEnvironmentsByRoom)
-		env.POST(":name", controller.GetLastEnvironmentByRoom)
-		env.DELETE(":name", controller.DeleteEnvironmentByRoom)
+		env.POST("/name", controller.GetLastEnvironmentByRoom)
+		env.DELETE("/name", controller.DeleteEnvironmentByRoom)
 	}
 
 	ticket := r.Group("/ticket")
@@ -53,8 +53,9 @@ func SetupRouter() *gin.Engine {
 	device := r.Group("/device")
 	device.Use(middleware.JWTAuthMiddleware())
 	{
-		device.GET("/get", controller.GetDeviceControl)
+		device.POST("/get", controller.GetDeviceControl)
 		device.POST("/update", controller.UpdateDeviceControl)
+		device.POST("/autoenv", controller.AutoEnvironmentByDevice)
 	}
 	return r
 }

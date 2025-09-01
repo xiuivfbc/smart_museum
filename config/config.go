@@ -12,8 +12,12 @@ type AppConfig struct {
 
 var Conf *viper.Viper
 var AppConfigInstance AppConfig
-var DeviceControl string = "000"
+var Device1 string = "00000000"
+var Device2 string = "00000000"
+var Device3 string = "00000000"
+var Device4 string = "00000000"
 var EntryNum int = 0
+var DeviceControl map[string]string
 
 // InitConfig 初始化配置文件读取
 func InitConfig() {
@@ -30,6 +34,11 @@ func InitConfig() {
 	if err != nil {
 		log.Fatalf("解析配置到结构体失败: %v", err)
 	}
+
+	DeviceControl["device1"] = Device1
+	DeviceControl["device2"] = Device2
+	DeviceControl["device3"] = Device3
+	DeviceControl["device4"] = Device4
 
 	log.Printf("配置文件加载成功，共加载 %d 个房间映射", len(AppConfigInstance.RoomMapping))
 }
