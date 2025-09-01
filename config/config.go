@@ -17,7 +17,7 @@ var Device2 string = "000000000"
 var Device3 string = "000000000"
 var Device4 string = "000000000"
 var EntryNum int = 0
-var DeviceControl map[string]string
+var DeviceControl = make(map[string]string)
 
 // InitConfig 初始化配置文件读取
 func InitConfig() {

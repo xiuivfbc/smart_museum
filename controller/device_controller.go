@@ -4,6 +4,7 @@ import (
 	"group_ten_server/config"
 	"group_ten_server/dao"
 	"group_ten_server/service"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -45,8 +46,8 @@ func AutoEnvironmentByDevice(c *gin.Context) {
 	var req struct {
 		Device string `json:"device"`
 		Data   struct {
-			Temperature float64 `json:"temperature"`
-			Humidity    float64 `json:"humidity"`
+			Temperature float64 `json:"温度"`
+			Humidity    float64 `json:"湿度"`
 		} `json:"data"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -54,8 +55,10 @@ func AutoEnvironmentByDevice(c *gin.Context) {
 		return
 	}
 	room := "room" + req.Device[len(req.Device)-1:]
+	log.Println("room:", room)
 	nowenv, _ := dao.GetEnvironmentByNameFromTable(room)
 	nowdev := []byte(config.DeviceControl[req.Device])
+	log.Println("当前环境数据:", nowenv)
 
 	if req.Data.Temperature > nowenv.Temperature && config.DeviceControl[req.Device] != "0" {
 		nowdev[0] = 0
@@ -71,6 +74,7 @@ func AutoEnvironmentByDevice(c *gin.Context) {
 	if req.Data.Humidity < nowenv.Humidity {
 		// 湿度低了，处理...
 	}
+	log.Println("更新后设备控制状态:", string(nowdev))
 	config.DeviceControl[req.Device] = string(nowdev)
 	// 向MQTT发布消息
 	topic := config.Conf.GetString("mqtt.device_topic")

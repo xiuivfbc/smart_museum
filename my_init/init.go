@@ -17,4 +17,5 @@ func init() {
 	dao.EnsureActivationCodes()
 	CollectDataFromHardware(config.Conf.GetString("mqtt.environment_topic"))
 	StartDailyEntryCountJob()
+	GetMaxKBPower()
 }

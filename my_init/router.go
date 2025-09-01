@@ -57,5 +57,11 @@ func SetupRouter() *gin.Engine {
 		device.POST("/update", controller.UpdateDeviceControl)
 		device.POST("/autoenv", controller.AutoEnvironmentByDevice)
 	}
+
+	ai := r.Group("/ai")
+	ai.Use(middleware.JWTAuthMiddleware())
+	{
+		ai.POST("/control", controller.AiControl)
+	}
 	return r
 }
