@@ -32,7 +32,7 @@ func UpdateDeviceControl(c *gin.Context) {
 	// 向MQTT发布消息
 	topic := config.Conf.GetString("mqtt.device_topic")
 	if topic != "" {
-		err := service.PublishMQTT(topic, req.Device+":"+req.Value)
+		err := service.PublishMQTT(topic, req.Value+req.Device[len(req.Device)-1:])
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "MQTT消息发送失败"})
 			return
@@ -57,11 +57,11 @@ func AutoEnvironmentByDevice(c *gin.Context) {
 	nowenv, _ := dao.GetEnvironmentByNameFromTable(room)
 	nowdev := []byte(config.DeviceControl[req.Device])
 
-	if req.Data.Temperature > nowenv.Temp && config.DeviceControl[req.Device] != "0" {
+	if req.Data.Temperature > nowenv.Temperature && config.DeviceControl[req.Device] != "0" {
 		nowdev[0] = 0
 		nowdev[1]++
 	}
-	if req.Data.Temperature < nowenv.Temp && config.DeviceControl[req.Device] != "3" {
+	if req.Data.Temperature < nowenv.Temperature && config.DeviceControl[req.Device] != "3" {
 		nowdev[0] = 0
 		nowdev[1]--
 	}
@@ -75,7 +75,7 @@ func AutoEnvironmentByDevice(c *gin.Context) {
 	// 向MQTT发布消息
 	topic := config.Conf.GetString("mqtt.device_topic")
 	if topic != "" {
-		err := service.PublishMQTT(topic, req.Device+":"+config.DeviceControl[req.Device])
+		err := service.PublishMQTT(topic, config.DeviceControl[req.Device]+req.Device[len(req.Device)-1:])
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "MQTT消息发送失败"})
 			return

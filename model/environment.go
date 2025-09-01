@@ -7,13 +7,16 @@ import "group_ten_server/config"
 // 可用于数据库映射和前后端交互
 
 type Environment struct {
-	ID       int     `json:"id" gorm:"primaryKey"` // 编号
-	Temp     float64 `json:"temp"`                 // 温度
-	Humidity float64 `json:"humidity"`             // 湿度
-	Status   string  `json:"status"`               // 状态
-	Info     string  `json:"info"`                 // 信息
-	Light    float64 `json:"light"`                // 灯光
-	Flame    bool    `json:"flame"`                // 火焰（true=有火焰，false=无火焰）
+	ID          int     `json:"id" gorm:"primaryKey"` // 编号
+	Temperature float64 `json:"temperature"`
+	Humidity    float64 `json:"humidity"`
+	Gas         int     `json:"gas"`
+	AutoFan     int     `json:"auto_fan"`
+	FanLevel    int     `json:"fan_level"`
+	AutoLight   int     `json:"auto_light"`
+	Light       int     `json:"light"`
+	Human       int     `json:"human"` // 通常表示是否检测到人 (0: 否, 1: 是)
+	Dark        int     `json:"dark"`  // 通常表示环境是否黑暗 (0: 否, 1: 是)
 }
 
 // TableName 动态表名方法
