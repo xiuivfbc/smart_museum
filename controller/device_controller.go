@@ -21,6 +21,10 @@ func GetDeviceControl(c *gin.Context) {
 	}
 	log.Println("请求的设备:", req.Device)
 	log.Println("当前设备控制状态:", config.DeviceControl[req.Device])
+	if len(config.DeviceControl[req.Device]) != 10 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "设备状态异常"})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{"value": config.DeviceControl[req.Device]})
 }
 
@@ -32,6 +36,11 @@ func UpdateDeviceControl(c *gin.Context) {
 	}
 	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
+		return
+	}
+	log.Println("请求的设备:", req.Device, "更新值:", req.Value)
+	if len(req.Value) != 10 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "value长度必须为10"})
 		return
 	}
 	config.DeviceControl[req.Device] = req.Value

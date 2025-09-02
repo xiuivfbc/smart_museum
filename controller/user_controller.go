@@ -1,8 +1,11 @@
 package controller
 
 import (
+	"errors"
+	"group_ten_server/config"
 	"group_ten_server/dao"
 	"group_ten_server/model"
+	"math/rand"
 	"net/http"
 	"regexp"
 	"strings"
@@ -10,9 +13,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/redis/go-redis/v9"
+	"gopkg.in/gomail.v2"
 )
 
 var jwtKey []byte
+
+var RedisClient *redis.Client
 
 func InitJwtKey(key string) {
 	jwtKey = []byte(key)
@@ -39,12 +46,13 @@ func isValidUserInput(s string) bool {
 // Register 用户注册
 func RegisterUser(c *gin.Context) {
 	var req struct {
-		Username   string `json:"username"`
-		Password   string `json:"password"`
-		Role       string `json:"role"`
-		Phone      string `json:"phone"`
-		Email      string `json:"email"`
-		Identifier string `json:"identifier"` // admin验证码
+		Username         string `json:"username"`
+		Password         string `json:"password"`
+		Role             string `json:"role"`
+		Phone            string `json:"phone"`
+		Email            string `json:"email"`
+		Identifier       string `json:"identifier"`        // admin验证码
+		VerificationCode string `json:"verification_code"` // 验证码
 	}
 	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
@@ -86,6 +94,12 @@ func RegisterUser(c *gin.Context) {
 	} else {
 		dao.DeleteActivationCode(req.Identifier)
 	}
+
+	if err := checkVerificationCode(c, req.Email, req.VerificationCode); err != nil {
+		c.JSON(http.StatusOK, gin.H{"error": err.Error()})
+		return
+	}
+
 	user := model.User{
 		Username:  req.Username,
 		Password:  req.Password, // 实际应加密
@@ -200,7 +214,77 @@ func UploadUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "更新成功"})
 }
 
+func GetVerificationCode(c *gin.Context) {
+	var req struct {
+		Email string `json:"email"`
+	}
+	if err := c.ShouldBind(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
+		return
+	}
+	// 检查是否发送太频繁 (Redis里查这个号有没有记录)
+	if exists, _ := RedisClient.Exists(c.Request.Context(), req.Email).Result(); exists > 0 {
+		c.JSON(200, "请勿频繁请求")
+		return
+	}
+	// 生成6位随机数字验证码
+	digits := []rune{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
+	codeRunes := make([]rune, 6)
+	rand.Seed(time.Now().UnixNano())
+	for i := 0; i < 6; i++ {
+		idx := rand.Intn(10)
+		codeRunes[i] = digits[idx]
+	}
+	code := string(codeRunes)
+
+	// 邮箱
+	if !IsValidEmail(req.Email) {
+		c.JSON(http.StatusOK, gin.H{"error": "邮箱格式不正确"})
+		return
+	}
+	if err := sendEmailVerificationCode(req.Email, code); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "发送邮箱验证码失败"})
+		return
+	}
+	// 将验证码存入Redis
+	err := RedisClient.Set(c.Request.Context(), req.Email, code, 1*time.Minute).Err()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "验证码存储失败"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "邮箱验证码已生成", "code": code})
+}
+
 func IsValidEmail(email string) bool {
 	re := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 	return re.MatchString(email)
+}
+
+func checkVerificationCode(c *gin.Context, email string, code string) error {
+	if correctCode, err := RedisClient.Get(c.Request.Context(), email).Result(); err != nil {
+		return errors.New("验证码不存在")
+	} else if correctCode == code {
+		RedisClient.Del(c.Request.Context(), email)
+		return nil
+	}
+	return errors.New("无效的验证码")
+}
+
+func sendEmailVerificationCode(email, code string) error {
+	from := config.Conf.GetString("qq.from")
+	password := config.Conf.GetString("qq.password")
+	smtpHost := "smtp.qq.com"
+	smtpPort := 587
+
+	m := gomail.NewMessage()
+	m.SetHeader("From", from)
+	m.SetHeader("To", email)
+	m.SetHeader("Subject", "您的验证码")
+	m.SetBody("text/plain", "您的验证码是："+code+"，1分钟内有效。")
+
+	d := gomail.NewDialer(smtpHost, smtpPort, from, password)
+	if err := d.DialAndSend(m); err != nil {
+		return err
+	}
+	return nil
 }

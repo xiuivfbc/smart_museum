@@ -29,6 +29,8 @@ func SetupRouter() *gin.Engine {
 		user.POST("/register", controller.RegisterUser)
 		user.POST("/login", controller.LoginUser)
 		user.POST("/upload", controller.UploadUser)
+
+		user.POST("/verificationCode", controller.GetVerificationCode)
 	}
 
 	env := r.Group("/environments")

@@ -16,6 +16,15 @@ server:
 mysql:
   dsn: root:123456@tcp(127.0.0.1:3306)/blog?charset=utf8mb4&parseTime=True&loc=Local
 
+redis:
+  addr: 127.0.0.1:6379
+  password: ""
+  db: 0
+
+qq:
+  from: 3138910969@qq.com
+  password: fgdaraymvrwkdgjj
+
 room_mapping:
   room1: enviroment1
   room2: enviroment2
