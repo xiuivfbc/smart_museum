@@ -15,6 +15,12 @@ func GetDeviceControl(c *gin.Context) {
 	var req struct {
 		Device string `json:"device"`
 	}
+	if err := c.ShouldBind(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
+		return
+	}
+	log.Println("请求的设备:", req.Device)
+	log.Println("当前设备控制状态:", config.DeviceControl[req.Device])
 	c.JSON(http.StatusOK, gin.H{"value": config.DeviceControl[req.Device]})
 }
 

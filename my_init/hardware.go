@@ -40,10 +40,10 @@ func CollectDataFromHardware(topic string) {
 				data.Room = "room1" // 默认房间
 			}
 			nowdev := []byte(config.DeviceControl["device"+data.Room[len(data.Room)-1:]])
-			nowdev[0] = byte(data.AutoFan)
-			nowdev[1] = byte(data.FanLevel)
-			nowdev[3] = byte(data.AutoLight)
-			nowdev[4] = byte(data.Light)
+			nowdev[0] = byte(data.AutoFan) + 48
+			nowdev[1] = byte(data.FanLevel) + 48
+			nowdev[3] = byte(data.AutoLight) + 48
+			nowdev[4] = byte(data.Light) + 48
 			config.DeviceControl["device"+data.Room[len(data.Room)-1:]] = string(nowdev)
 
 			env := model.Environment{
