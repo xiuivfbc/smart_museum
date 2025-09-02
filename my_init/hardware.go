@@ -40,11 +40,13 @@ func CollectDataFromHardware(topic string) {
 				data.Room = "room1" // 默认房间
 			}
 			nowdev := []byte(config.DeviceControl["device"+data.Room[len(data.Room)-1:]])
+			log.Println("当前设备控制状态:", string(nowdev))
 			nowdev[0] = byte(data.AutoFan) + 48
 			nowdev[1] = byte(data.FanLevel) + 48
 			nowdev[3] = byte(data.AutoLight) + 48
 			nowdev[4] = byte(data.Light) + 48
 			config.DeviceControl["device"+data.Room[len(data.Room)-1:]] = string(nowdev)
+			log.Println("更新后设备控制状态:", config.DeviceControl["device"+data.Room[len(data.Room)-1:]])
 
 			env := model.Environment{
 				Temperature: data.Temperature,

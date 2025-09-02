@@ -35,6 +35,7 @@ func UpdateDeviceControl(c *gin.Context) {
 		return
 	}
 	config.DeviceControl[req.Device] = req.Value
+	log.Println("更新后设备控制状态:", config.DeviceControl[req.Device])
 
 	// 向MQTT发布消息
 	topic := config.Conf.GetString("mqtt.device_topic")

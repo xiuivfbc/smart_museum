@@ -12,10 +12,10 @@ type AppConfig struct {
 
 var Conf *viper.Viper
 var AppConfigInstance AppConfig
-var Device1 string = "000000000"
-var Device2 string = "000000000"
-var Device3 string = "000000000"
-var Device4 string = "000000000"
+var Device1 string = "0000000001"
+var Device2 string = "0000000001"
+var Device3 string = "0000000001"
+var Device4 string = "0000000001"
 var EntryNum int = 0
 var DeviceControl = make(map[string]string)
 
