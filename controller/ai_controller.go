@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// admin用户获取ai回复并自动控制设备
 func AiControl(c *gin.Context) {
 	var req struct {
 		Question string `json:"question"`

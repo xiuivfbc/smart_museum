@@ -58,6 +58,7 @@ func UpdateDeviceControl(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "更新成功"})
 }
 
+// AutoEnvironmentByDevice 根据设备数据自动调整环境
 func AutoEnvironmentByDevice(c *gin.Context) {
 	var req struct {
 		Device string `json:"device"`

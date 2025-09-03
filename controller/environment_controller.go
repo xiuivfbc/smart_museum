@@ -52,7 +52,7 @@ func GetAllEnvironmentsByRoom(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": envs})
 }
 
-// CreateEnvironmentByRoom 支持内部调用，参数为env和room
+// CreateEnvironmentByRoom 仅支持内部调用，参数为env和room
 func CreateEnvironmentByRoom(room string, env *model.Environment) error {
 	table, ok := config.AppConfigInstance.RoomMapping[room]
 	if !ok {

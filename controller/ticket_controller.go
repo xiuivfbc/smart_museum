@@ -34,7 +34,7 @@ func CreateTicket(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"error": "时间格式错误，需为RFC3339格式"})
 		return
 	}
-	// 生成二维码，内容为 id,time
+	// 生成二维码，内容为 url
 	saveDir := config.Conf.GetString("server.path") + "/qrcodes"
 	content := "http://" + config.Conf.GetString("gin.ip") + ":" + config.Conf.GetString("gin.port") + "/ticket/use?ticket_id=" + strconv.Itoa(req.ID)
 	fileName := fmt.Sprintf("qrcode_%d.png", req.ID)
