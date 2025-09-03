@@ -1,0 +1,272 @@
+package service
+
+import (
+	"errors"
+	"group_ten_server/config"
+	"group_ten_server/dao"
+	"group_ten_server/model"
+	"math/rand"
+	"net/http"
+	"regexp"
+	"strings"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/redis/go-redis/v9"
+	"gopkg.in/gomail.v2"
+)
+
+var jwtKey []byte
+var RedisClient *redis.Client
+
+type UserClaims struct {
+	UserID   int    `json:"user_id"`
+	Username string `json:"username"`
+	jwt.RegisteredClaims
+}
+
+func InitJwtKey(key string) {
+	jwtKey = []byte(key)
+} // UserClaims 用于JWT
+
+func RegisterUserService(c *gin.Context, req interface{}) {
+	reqStruct, ok := req.(struct {
+		Username         string `json:"username"`
+		Password         string `json:"password"`
+		Role             string `json:"role"`
+		Phone            string `json:"phone"`
+		Email            string `json:"email"`
+		Identifier       string `json:"identifier"`
+		VerificationCode string `json:"verification_code"`
+	})
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "参数类型错误"})
+		return
+	}
+	if !isValidUserInput(reqStruct.Password) {
+		c.JSON(http.StatusOK, gin.H{"error": "密码不能为空且不能包含空格"})
+		return
+	}
+	if strings.TrimSpace(reqStruct.Phone) == "" && strings.TrimSpace(reqStruct.Email) == "" {
+		c.JSON(http.StatusOK, gin.H{"error": "电话和邮箱至少填写一个"})
+		return
+	}
+	if reqStruct.Email != "" && !IsValidEmail(reqStruct.Email) {
+		c.JSON(http.StatusOK, gin.H{"error": "邮箱格式不正确"})
+		return
+	}
+	if reqStruct.Phone != "" {
+		var user model.User
+		db := dao.GetDB()
+		if err := db.Where("phone = ?", reqStruct.Phone).First(&user).Error; err == nil {
+			c.JSON(http.StatusOK, gin.H{"error": "电话已被注册"})
+			return
+		}
+	}
+	if reqStruct.Email != "" {
+		var user model.User
+		db := dao.GetDB()
+		if err := db.Where("email = ?", reqStruct.Email).First(&user).Error; err == nil {
+			c.JSON(http.StatusOK, gin.H{"error": "邮箱已被注册"})
+			return
+		}
+	}
+	if ok, _ := dao.GetActivationCode(reqStruct.Identifier); reqStruct.Role == "admin" && !ok {
+		c.JSON(http.StatusOK, gin.H{"error": "无效的管理员激活码"})
+		return
+	} else {
+		dao.DeleteActivationCode(reqStruct.Identifier)
+	}
+	if err := checkVerificationCode(c, reqStruct.Email, reqStruct.VerificationCode); err != nil {
+		c.JSON(http.StatusOK, gin.H{"error": err.Error()})
+		return
+	}
+	user := model.User{
+		Username:  reqStruct.Username,
+		Password:  reqStruct.Password,
+		Role:      reqStruct.Role,
+		Phone:     reqStruct.Phone,
+		Email:     reqStruct.Email,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+	err := dao.CreateUser(&user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "注册失败"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "注册成功"})
+}
+
+func LoginUserService(c *gin.Context, req interface{}) {
+	reqStruct, ok := req.(struct {
+		Identifier string `json:"identifier"`
+		Password   string `json:"password"`
+	})
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "参数类型错误"})
+		return
+	}
+	if strings.TrimSpace(reqStruct.Identifier) == "" || !isValidUserInput(reqStruct.Password) {
+		c.JSON(http.StatusOK, gin.H{"error": "账号和密码不能为空且不能包含空格"})
+		return
+	}
+	var user *model.User
+	var err error
+	if strings.Contains(reqStruct.Identifier, "@") {
+		user, err = dao.GetUserByEmail(reqStruct.Identifier)
+	} else {
+		user, err = dao.GetUserByPhone(reqStruct.Identifier)
+	}
+	if err != nil || user == nil || user.Password != reqStruct.Password {
+		c.JSON(http.StatusOK, gin.H{"error": "账号或密码错误"})
+		return
+	}
+	claims := UserClaims{
+		UserID:   user.ID,
+		Username: user.Username,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(jwtKey)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "生成token失败"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "登录成功", "token": tokenString, "id": user.ID, "userform": user})
+}
+
+func UploadUserService(c *gin.Context, req interface{}) {
+	reqStruct, ok := req.(struct {
+		Id          int    `json:"id"`
+		Username    string `json:"username"`
+		Phone       string `json:"phone"`
+		Email       string `json:"email"`
+		Password    string `json:"password"`
+		NewPassword string `json:"new_password"`
+	})
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "参数类型错误"})
+		return
+	}
+	user := &model.User{}
+	db := dao.GetDB()
+	if err := db.First(user, reqStruct.Id).Error; err != nil {
+		c.JSON(http.StatusOK, gin.H{"error": "用户不存在"})
+		return
+	}
+	if user.Password != reqStruct.Password {
+		c.JSON(http.StatusOK, gin.H{"error": "密码错误"})
+		return
+	}
+	update := map[string]any{}
+	if reqStruct.Username != "" {
+		update["username"] = reqStruct.Username
+	}
+	if reqStruct.Phone != "" {
+		update["phone"] = reqStruct.Phone
+	}
+	if reqStruct.Email != "" {
+		if !IsValidEmail(reqStruct.Email) {
+			c.JSON(http.StatusOK, gin.H{"error": "邮箱格式不正确"})
+			return
+		}
+		update["email"] = reqStruct.Email
+	}
+	if reqStruct.NewPassword != "" {
+		update["password"] = reqStruct.NewPassword
+	}
+	if len(update) == 0 {
+		c.JSON(http.StatusOK, gin.H{"error": "无可更新字段"})
+		return
+	}
+	if err := db.Model(user).Updates(update).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "更新失败"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "更新成功"})
+}
+
+func GetVerificationCodeService(c *gin.Context, req interface{}) {
+	reqStruct, ok := req.(struct {
+		Email string `json:"email"`
+	})
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "参数类型错误"})
+		return
+	}
+	if exists, _ := RedisClient.Exists(c.Request.Context(), reqStruct.Email).Result(); exists > 0 {
+		c.JSON(200, "请勿频繁请求")
+		return
+	}
+	digits := []rune{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
+	codeRunes := make([]rune, 6)
+	rand.Seed(time.Now().UnixNano())
+	for i := 0; i < 6; i++ {
+		idx := rand.Intn(10)
+		codeRunes[i] = digits[idx]
+	}
+	code := string(codeRunes)
+	if !IsValidEmail(reqStruct.Email) {
+		c.JSON(http.StatusOK, gin.H{"error": "邮箱格式不正确"})
+		return
+	}
+	if err := sendEmailVerificationCode(reqStruct.Email, code); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "发送邮箱验证码失败"})
+		return
+	}
+	err := RedisClient.Set(c.Request.Context(), reqStruct.Email, code, 3*time.Minute).Err()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "验证码存储失败"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "邮箱验证码已生成", "code": code})
+}
+
+func isValidUserInput(s string) bool {
+	if strings.TrimSpace(s) == "" {
+		return false
+	}
+	if strings.ContainsAny(s, " ") {
+		return false
+	}
+	return true
+}
+
+func IsValidEmail(email string) bool {
+	re := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+	return re.MatchString(email)
+}
+
+func checkVerificationCode(c *gin.Context, email string, code string) error {
+	if correctCode, err := RedisClient.Get(c.Request.Context(), email).Result(); err != nil {
+		return errors.New("验证码不存在")
+	} else if correctCode == code {
+		RedisClient.Del(c.Request.Context(), email)
+		return nil
+	}
+	return errors.New("无效的验证码")
+}
+
+func sendEmailVerificationCode(email, code string) error {
+	from := config.Conf.GetString("qq.from")
+	password := config.Conf.GetString("qq.password")
+	smtpHost := "smtp.qq.com"
+	smtpPort := 587
+
+	m := gomail.NewMessage()
+	m.SetHeader("From", from)
+	m.SetHeader("To", email)
+	m.SetHeader("Subject", "您的验证码")
+	m.SetBody("text/plain", "您的验证码是："+code+"，1分钟内有效。")
+
+	d := gomail.NewDialer(smtpHost, smtpPort, from, password)
+	if err := d.DialAndSend(m); err != nil {
+		return err
+	}
+	return nil
+}

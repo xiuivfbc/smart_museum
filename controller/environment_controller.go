@@ -5,6 +5,7 @@ import (
 	"group_ten_server/config"
 	"group_ten_server/dao"
 	"group_ten_server/model"
+	"group_ten_server/service"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -18,17 +19,7 @@ func GetLastEnvironmentByRoom(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
 		return
 	}
-	table, ok := config.AppConfigInstance.RoomMapping[req.Room]
-	if !ok {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "无效房间名"})
-		return
-	}
-	env, err := dao.GetEnvironmentByNameFromTable(table)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"error": "未找到"})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"data": env})
+	service.GetLastEnvironmentByRoomService(c, req)
 }
 
 func GetAllEnvironmentsByRoom(c *gin.Context) {
@@ -39,17 +30,7 @@ func GetAllEnvironmentsByRoom(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
 		return
 	}
-	table, ok := config.AppConfigInstance.RoomMapping[req.Room]
-	if !ok {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "无效房间名"})
-		return
-	}
-	envs, err := dao.GetAllEnvironmentsFromTable(table)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "查询失败"})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"data": envs})
+	service.GetAllEnvironmentsByRoomService(c, req)
 }
 
 // CreateEnvironmentByRoom 仅支持内部调用，参数为env和room
@@ -72,14 +53,5 @@ func DeleteEnvironmentByRoom(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
 		return
 	}
-	table, ok := config.AppConfigInstance.RoomMapping[req.Room]
-	if !ok {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "无效房间名"})
-		return
-	}
-	if err := dao.DeleteEnvironmentByNameFromTable(table); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "删除失败"})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "删除成功"})
+	service.DeleteEnvironmentByRoomService(c, req)
 }
