@@ -247,7 +247,7 @@ func GetVerificationCode(c *gin.Context) {
 		return
 	}
 	// 将验证码存入Redis
-	err := RedisClient.Set(c.Request.Context(), req.Email, code, 1*time.Minute).Err()
+	err := RedisClient.Set(c.Request.Context(), req.Email, code, 3*time.Minute).Err()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "验证码存储失败"})
 		return
