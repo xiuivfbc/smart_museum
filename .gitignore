@@ -4,3 +4,4 @@ bin/
 .env
 qrcodes/*
 !qrcodes/.gitkeep
+config/config.yaml

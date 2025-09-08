@@ -95,12 +95,16 @@ func AiControlService(c *gin.Context, req interface{}) {
 	content := result.Data.Content
 	re := regexp.MustCompile("```json\\s*(\\{.*?\\})\\s*```")
 	matches := re.FindStringSubmatch(content)
+	var data map[string]interface{}
 	if len(matches) >= 2 {
-		var data map[string]interface{}
 		if err := json.Unmarshal([]byte(matches[1]), &data); err == nil {
+			// 去除json部分
+			content = re.ReplaceAllString(content, "")
 			c.JSON(200, gin.H{"content": content, "data": data})
 			return
 		}
 	}
+	// 没有json则只去除可能的json块
+	content = re.ReplaceAllString(content, "")
 	c.JSON(200, gin.H{"content": content})
 }

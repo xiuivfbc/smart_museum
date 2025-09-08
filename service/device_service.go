@@ -56,11 +56,9 @@ func UpdateDeviceControlService(c *gin.Context, req interface{}) {
 
 func AutoEnvironmentByDeviceService(c *gin.Context, req interface{}) {
 	reqStruct, ok := req.(struct {
-		Device string `json:"device"`
-		Data   struct {
-			Temperature float64 `json:"温度"`
-			Humidity    float64 `json:"湿度"`
-		} `json:"data"`
+		Device      string  `json:"device"`
+		Temperature float64 `json:"温度"`
+		Humidity    float64 `json:"湿度"`
 	})
 	if !ok {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "参数类型错误"})
@@ -68,23 +66,22 @@ func AutoEnvironmentByDeviceService(c *gin.Context, req interface{}) {
 	}
 	room := "room" + reqStruct.Device[len(reqStruct.Device)-1:]
 	log.Println("room:", room)
-	nowenv, _ := dao.GetEnvironmentByNameFromTable(room)
+	nowenv, _ := dao.GetEnvironmentByNameFromTable(config.AppConfigInstance.RoomMapping[room])
 	nowdev := []byte(config.DeviceControl[reqStruct.Device])
 	log.Println("当前环境数据:", nowenv)
 
-	if reqStruct.Data.Temperature > nowenv.Temperature && config.DeviceControl[reqStruct.Device] != "0" {
+	if reqStruct.Temperature > nowenv.Temperature && config.DeviceControl[reqStruct.Device] != "0" {
 		nowdev[0] = 0
 		nowdev[1]++
 	}
-	if reqStruct.Data.Temperature < nowenv.Temperature && config.DeviceControl[reqStruct.Device] != "3" {
+	if reqStruct.Temperature < nowenv.Temperature && config.DeviceControl[reqStruct.Device] != "3" {
 		nowdev[0] = 0
 		nowdev[1]--
 	}
-	if reqStruct.Data.Humidity > nowenv.Humidity {
-		// 湿度高了，处理...
-	}
-	if reqStruct.Data.Humidity < nowenv.Humidity {
-		// 湿度低了，处理...
+	if reqStruct.Humidity > nowenv.Humidity {
+		nowdev[10] = 1
+		nowdev[12] = byte(int(reqStruct.Humidity)/10 + '0')
+		nowdev[13] = byte(int(reqStruct.Humidity)%10 + '0')
 	}
 	log.Println("更新后设备控制状态:", string(nowdev))
 	config.DeviceControl[reqStruct.Device] = string(nowdev)
