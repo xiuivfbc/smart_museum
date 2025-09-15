@@ -1,24 +1,21 @@
 package dao
 
 import (
-	"group_ten_server/config"
 	"group_ten_server/model"
 	"time"
 )
 
-func InsertNewDailyEntryCount() error {
+func InsertNewDailyEntryCount(v int) error {
 	now := time.Now()
 	yesterday := time.Date(now.Year(), now.Month(), now.Day()-1, 0, 0, 0, 0, now.Location())
 	temp := model.Daily{
 		Time: yesterday,
-		Num:  config.EntryNum,
+		Num:  v,
 	}
 	// 插入新行
 	if err := db.Create(&temp).Error; err != nil {
 		return err
 	}
-	// 重置全局计数器
-	config.EntryNum = 0
 	return nil
 }
 

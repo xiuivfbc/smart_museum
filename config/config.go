@@ -16,8 +16,11 @@ var Device1 string = "0000000001"
 var Device2 string = "0000000001"
 var Device3 string = "0000000001"
 var Device4 string = "0000000001"
-var EntryNum int = 0
 var DeviceControl = make(map[string]string)
+
+const (
+	TOTAL_NUM = "total_num"
+)
 
 // InitConfig 初始化配置文件读取
 func InitConfig() {

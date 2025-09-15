@@ -130,7 +130,8 @@ func UpdateTicketService(c *gin.Context, req interface{}) {
 }
 
 func GetTodayEntryCountService(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"count": config.EntryNum})
+	v, _ := RedisClient.Get(c, config.TOTAL_NUM).Int()
+	c.JSON(http.StatusOK, gin.H{"count": v})
 }
 
 func GetAllEntryCountsService(c *gin.Context) {
@@ -165,6 +166,6 @@ func UseTicketService(c *gin.Context) {
 		log.Println("删除票失败:", err)
 		return
 	}
-	config.EntryNum++
+	RedisClient.Incr(c, config.TOTAL_NUM)
 	c.File(config.Conf.GetString("filepath"))
 }
