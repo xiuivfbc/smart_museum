@@ -1,8 +1,6 @@
 package dao
 
-import (
-	"group_ten_server/model"
-)
+import "github.com/xiuivfbc/smart_museum/model"
 
 func CreateEnvironmentToTable(table string, env *model.Environment) error {
 	return db.Table(table).Create(env).Error

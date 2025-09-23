@@ -1,8 +1,9 @@
 package main
 
 import (
-	"group_ten_server/my_init"
 	"log"
+
+	"github.com/xiuivfbc/smart_museum/my_init"
 )
 
 // main 作为程序入口，只负责启动服务和调用路由

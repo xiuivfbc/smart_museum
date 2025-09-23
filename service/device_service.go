@@ -1,12 +1,12 @@
 package service
 
 import (
-	"group_ten_server/config"
-	"group_ten_server/dao"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/xiuivfbc/smart_museum/config"
+	"github.com/xiuivfbc/smart_museum/dao"
 )
 
 func GetDeviceControlService(c *gin.Context, req interface{}) {

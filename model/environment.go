@@ -1,6 +1,6 @@
 package model
 
-import "group_ten_server/config"
+import "github.com/xiuivfbc/smart_museum/config"
 
 // Environment 表示环境数据模型
 // 包含编号、温度、湿度、状态、信息、灯光、火焰等字段

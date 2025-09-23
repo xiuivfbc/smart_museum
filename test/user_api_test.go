@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"group_ten_server/my_init"
+	"github.com/xiuivfbc/smart_museum/my_init"
 )
 
 type UserReq struct {

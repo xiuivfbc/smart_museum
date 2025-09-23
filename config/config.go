@@ -25,7 +25,7 @@ const (
 // InitConfig 初始化配置文件读取
 func InitConfig() {
 	Conf = viper.New()
-	Conf.SetConfigName("config")
+	Conf.SetConfigName("config_my")
 	Conf.SetConfigType("yaml")
 	Conf.AddConfigPath("./config")
 	err := Conf.ReadInConfig()

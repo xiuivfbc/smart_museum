@@ -2,10 +2,10 @@ package my_init
 
 import (
 	"context"
-	"group_ten_server/config"
-	"group_ten_server/service"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/xiuivfbc/smart_museum/config"
+	"github.com/xiuivfbc/smart_museum/service"
 )
 
 func InitRedis() {

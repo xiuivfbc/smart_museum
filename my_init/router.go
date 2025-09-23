@@ -1,11 +1,10 @@
 package my_init
 
 import (
-	"group_ten_server/config"
-	"group_ten_server/controller"
-	"group_ten_server/middleware"
-
 	"github.com/gin-contrib/cors"
+	"github.com/xiuivfbc/smart_museum/config"
+	"github.com/xiuivfbc/smart_museum/controller"
+	"github.com/xiuivfbc/smart_museum/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,6 +22,21 @@ func SetupRouter() *gin.Engine {
 		AllowCredentials: true,
 	}))
 	r.Static("/qrcodes", qrPath)
+
+	// 静态文件服务 - 前端页面
+	frontendPath := config.Conf.GetString("server.path") + "/frontend"
+	r.Static("/frontend", frontendPath)
+
+	// 根路径重定向到前端
+	r.GET("/", func(c *gin.Context) {
+		c.Redirect(302, "/frontend/index.html")
+	})
+
+	// favicon 处理
+	r.GET("/favicon.ico", func(c *gin.Context) {
+		c.Status(204) // No Content
+	})
+
 	r.GET("/ticket/use", controller.UseTicket)
 	user := r.Group("/auth")
 	{

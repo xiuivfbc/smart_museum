@@ -1,12 +1,12 @@
 package test
 
 import (
-	"group_ten_server/config"
-	"group_ten_server/service"
 	"testing"
 	"time"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
+	"github.com/xiuivfbc/smart_museum/config"
+	"github.com/xiuivfbc/smart_museum/service"
 )
 
 func TestMQTTConnectAndPubSub(t *testing.T) {

@@ -2,13 +2,13 @@ package my_init
 
 import (
 	"encoding/json"
-	"group_ten_server/config"
-	"group_ten_server/controller"
-	"group_ten_server/model"
-	"group_ten_server/service"
 	"log"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
+	"github.com/xiuivfbc/smart_museum/config"
+	"github.com/xiuivfbc/smart_museum/controller"
+	"github.com/xiuivfbc/smart_museum/model"
+	"github.com/xiuivfbc/smart_museum/service"
 )
 
 // 从硬件收集数据

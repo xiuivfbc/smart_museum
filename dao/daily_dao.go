@@ -1,8 +1,9 @@
 package dao
 
 import (
-	"group_ten_server/model"
 	"time"
+
+	"github.com/xiuivfbc/smart_museum/model"
 )
 
 func InsertNewDailyEntryCount(v int) error {

@@ -2,9 +2,6 @@ package service
 
 import (
 	"errors"
-	"group_ten_server/config"
-	"group_ten_server/dao"
-	"group_ten_server/model"
 	"math/rand"
 	"net/http"
 	"regexp"
@@ -14,6 +11,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/redis/go-redis/v9"
+	"github.com/xiuivfbc/smart_museum/config"
+	"github.com/xiuivfbc/smart_museum/dao"
+	"github.com/xiuivfbc/smart_museum/model"
 	"gopkg.in/gomail.v2"
 )
 

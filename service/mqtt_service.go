@@ -1,9 +1,8 @@
 package service
 
 import (
-	"group_ten_server/config"
-
 	MQTT "github.com/eclipse/paho.mqtt.golang"
+	"github.com/xiuivfbc/smart_museum/config"
 )
 
 var mqttClient MQTT.Client

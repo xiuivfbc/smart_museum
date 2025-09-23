@@ -2,7 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	"group_ten_server/service"
+	"github.com/xiuivfbc/smart_museum/service"
 )
 
 func AiControl(c *gin.Context) {

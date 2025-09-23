@@ -1,11 +1,11 @@
 package service
 
 import (
-	"group_ten_server/config"
-	"group_ten_server/dao"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/xiuivfbc/smart_museum/config"
+	"github.com/xiuivfbc/smart_museum/dao"
 )
 
 func GetLastEnvironmentByRoomService(c *gin.Context, req interface{}) {

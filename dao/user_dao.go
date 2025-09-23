@@ -1,8 +1,7 @@
 package dao
 
 import (
-	"group_ten_server/model"
-
+	"github.com/xiuivfbc/smart_museum/model"
 	"gorm.io/gorm"
 )
 

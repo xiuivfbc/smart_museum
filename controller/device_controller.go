@@ -1,10 +1,10 @@
 package controller
 
 import (
-	"group_ten_server/service"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/xiuivfbc/smart_museum/service"
 )
 
 // 获取DeviceControl值

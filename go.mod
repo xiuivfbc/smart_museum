@@ -1,4 +1,4 @@
-module group_ten_server
+module github.com/xiuivfbc/smart_museum
 
 go 1.24.5
 

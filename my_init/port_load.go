@@ -1,6 +1,6 @@
 package my_init
 
-import "group_ten_server/config"
+import "github.com/xiuivfbc/smart_museum/config"
 
 func GetServerPort() (port string) {
 	if s := config.Conf.GetString("gin.port"); s != "" {

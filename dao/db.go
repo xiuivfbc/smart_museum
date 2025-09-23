@@ -1,10 +1,10 @@
 package dao
 
 import (
-	"group_ten_server/config"
-	"group_ten_server/model"
 	"log"
 
+	"github.com/xiuivfbc/smart_museum/config"
+	"github.com/xiuivfbc/smart_museum/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )

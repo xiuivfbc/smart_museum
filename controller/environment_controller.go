@@ -2,13 +2,13 @@ package controller
 
 import (
 	"fmt"
-	"group_ten_server/config"
-	"group_ten_server/dao"
-	"group_ten_server/model"
-	"group_ten_server/service"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/xiuivfbc/smart_museum/config"
+	"github.com/xiuivfbc/smart_museum/dao"
+	"github.com/xiuivfbc/smart_museum/model"
+	"github.com/xiuivfbc/smart_museum/service"
 )
 
 func GetLastEnvironmentByRoom(c *gin.Context) {

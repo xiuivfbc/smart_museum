@@ -2,9 +2,6 @@ package service
 
 import (
 	"fmt"
-	"group_ten_server/config"
-	"group_ten_server/dao"
-	"group_ten_server/model"
 	"log"
 	"net/http"
 	"os"
@@ -14,6 +11,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/skip2/go-qrcode"
+	"github.com/xiuivfbc/smart_museum/config"
+	"github.com/xiuivfbc/smart_museum/dao"
+	"github.com/xiuivfbc/smart_museum/model"
 )
 
 func CreateTicketService(c *gin.Context, req interface{}) {

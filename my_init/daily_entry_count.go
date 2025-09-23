@@ -2,12 +2,13 @@ package my_init
 
 import (
 	"context"
-	"group_ten_server/config"
-	"group_ten_server/dao"
-	"group_ten_server/service"
 	"log"
 
+	"github.com/xiuivfbc/smart_museum/config"
+	"github.com/xiuivfbc/smart_museum/service"
+
 	"github.com/robfig/cron/v3"
+	"github.com/xiuivfbc/smart_museum/dao"
 )
 
 func StartDailyEntryCountJob() {

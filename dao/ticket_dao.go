@@ -1,8 +1,6 @@
 package dao
 
-import (
-	"group_ten_server/model"
-)
+import "github.com/xiuivfbc/smart_museum/model"
 
 // CreateTicket 新建工单
 func CreateTicket(ticket *model.Ticket) error {
