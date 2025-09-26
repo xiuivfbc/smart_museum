@@ -1,0 +1,128 @@
+{
+	"pages": [{
+			"path": "pages/Index/index",
+			"style": {
+				"navigationBarTitleText": "选择身份",
+				"navigationStyle": "custom" // 可以隐藏默认导航栏
+			}
+		},
+
+		// 公众身份的首页和 tabBar 页面
+		{
+			"path": "pages/Public/public_home",
+			"style": {}
+		},
+		{
+			"path": "pages/Public/public_ai",
+			"style": {}
+		},
+		{
+			"path": "pages/Public/public_me",
+			"style": {}
+		},
+		{
+			"path": "pages/Public/public_login",
+			"style": {}
+		},
+		{
+			"path": "pages/Public/public_register",
+			"style": {}
+		},
+		{
+			"path": "pages/Public/public_profile",
+			"style": {}
+		},
+		{
+			"path": "pages/Public/public_edit_profile",
+			"style": {}
+		},
+		{
+			"path": "pages/Public/public_change_password",
+			"style": {}
+		},
+
+		// 专家身份的首页和 tabBar 页面
+		{
+			"path": "pages/Expert/expert_home",
+			"style": {}
+		},
+		{
+			"path": "pages/Expert/expert_ai",
+			"style": {}
+		},
+		{
+			"path": "pages/Expert/expert_me",
+			"style": {}
+		},
+		{
+			"path": "pages/Expert/expert_login",
+			"style": {}
+		},
+		{
+			"path": "pages/Expert/expert_register",
+			"style": {}
+		},
+
+		{
+			"path": "pages/Common/public_tabbar",
+			"style": {}
+		},
+		{
+			"path": "pages/Common/expert_tabbar",
+			"style": {}
+		},
+		
+		{
+			"path": "pages/Ticket/ticket_buy",
+			"style": {}
+		},
+		{
+			"path": "pages/Ticket/ticket_check",
+			"style": {}
+		},
+		{
+			"path": "pages/Ticket/ticket_change",
+			"style": {}
+		},
+		{
+			"path": "pages/Ticket/ticket_refund",
+			"style": {}
+		},
+		{
+			"path": "pages/Expert/expert_hall",
+			"style": {}
+		},
+		{
+			"path": "pages/Expert/expert_cage",
+			"style": {}
+		},
+		{
+			"path": "pages/Expert/expert_profile",
+			"style": {}
+		},
+		{
+			"path": "pages/Expert/expert_edit_profile",
+			"style": {}
+		},
+		{
+			"path": "pages/Expert/expert_change_password",
+			"style": {}
+		},
+       {
+             "path": "pages/cardDetail/cardDetail",
+             "style": {
+               "navigationBarTitleText": "卡片详情"
+             }
+           }
+	],
+
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "博物馆奇妙夜",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8",
+		"app-plus": {
+			"titleView": false
+		}
+	}
+}
