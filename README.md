@@ -22,17 +22,17 @@
 - **安全认证**：JWT + 邮箱验证码 + 激活码多重安全保障
 
 ## 实践展示
-![alt text](c54c4ea4a0ef83dcf731a91d31350242.png)
-![alt text](62dda82c7a0b86766ba07e7ddaa21c88.png)
-![alt text](5d44f59b9ec1d4cd2b9db53e42f7809e.png)
-![alt text](9e0cb61ecffd825e83dbe04b3c0ba18c.png)
-![alt text](860202a574621cab20c2330a4ad014b8.png)
-![alt text](a0cd496541c3d492ae6a838ecb0b65fd.png)
-![alt text](4ad04a1fb8e7b29b0f7cd49036f43284.png)
-![alt text](69ff61bff3ed66995cc8cce818c6fb2b.png)
-![alt text](197faefa32fc1c7e1c6b076747329876.png)
-![alt text](94d898fea30667a511e878ad86580117.png)
-![alt text](3c694294efe834c0ce00ece418af8bac.png)
+![alt text](static/c54c4ea4a0ef83dcf731a91d31350242.png)
+![alt text](static/62dda82c7a0b86766ba07e7ddaa21c88.png)
+![alt text](static/5d44f59b9ec1d4cd2b9db53e42f7809e.png)
+![alt text](static/9e0cb61ecffd825e83dbe04b3c0ba18c.png)
+![alt text](static/860202a574621cab20c2330a4ad014b8.png)
+![alt text](static/a0cd496541c3d492ae6a838ecb0b65fd.png)
+![alt text](static/4ad04a1fb8e7b29b0f7cd49036f43284.png)
+![alt text](static/69ff61bff3ed66995cc8cce818c6fb2b.png)
+![alt text](static/197faefa32fc1c7e1c6b076747329876.png)
+![alt text](static/94d898fea30667a511e878ad86580117.png)
+![alt text](static/3c694294efe834c0ce00ece418af8bac.png)
 
 ## 🏗️ 系统架构
 
