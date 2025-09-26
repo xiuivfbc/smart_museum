@@ -21,18 +21,36 @@
 - **物联网集成**：MQTT 协议实现设备实时通信
 - **安全认证**：JWT + 邮箱验证码 + 激活码多重安全保障
 
-## 实践展示
-![alt text](static/c54c4ea4a0ef83dcf731a91d31350242.png)
-![alt text](static/62dda82c7a0b86766ba07e7ddaa21c88.png)
-![alt text](static/5d44f59b9ec1d4cd2b9db53e42f7809e.png)
-![alt text](static/9e0cb61ecffd825e83dbe04b3c0ba18c.png)
-![alt text](static/860202a574621cab20c2330a4ad014b8.png)
-![alt text](static/a0cd496541c3d492ae6a838ecb0b65fd.png)
-![alt text](static/4ad04a1fb8e7b29b0f7cd49036f43284.png)
-![alt text](static/69ff61bff3ed66995cc8cce818c6fb2b.png)
-![alt text](static/197faefa32fc1c7e1c6b076747329876.png)
-![alt text](static/94d898fea30667a511e878ad86580117.png)
-![alt text](static/3c694294efe834c0ce00ece418af8bac.png)
+## 🎯 系统展示
+#### 用户认证系统
+<div align="center">
+  <img src="static/c54c4ea4a0ef83dcf731a91d31350242.png" width="30%" alt="身份选择"/>
+  <img src="static/62dda82c7a0b86766ba07e7ddaa21c88.png" width="30%" alt="游客注册"/>
+  <img src="static/69ff61bff3ed66995cc8cce818c6fb2b.png" width="30%" alt="专家注册"/>
+</div>
+
+### 👥 游客模式 (普通用户功能)
+#### 基本页面
+<div align="center">
+  <img src="static/5d44f59b9ec1d4cd2b9db53e42f7809e.png" width="30%" alt="首页"/>
+  <img src="static/9e0cb61ecffd825e83dbe04b3c0ba18c.png" width="30%" alt="个人管理"/>
+  <img src="static/860202a574621cab20c2330a4ad014b8.png" width="30%" alt="信息更新"/>
+</div>
+
+#### 票务服务
+<div align="center">
+  <img src="static/a0cd496541c3d492ae6a838ecb0b65fd.png" width="30%" alt="购票"/>
+  <img src="static/4ad04a1fb8e7b29b0f7cd49036f43284.png" width="30%" alt="二维码展示"/>
+  <img src="static/image.png" width="30%" alt="退票"/>
+</div>
+### 🔧 专家模式 (管理员功能)
+
+#### 设备控制中心
+<div align="center">
+  <img src="static/197faefa32fc1c7e1c6b076747329876.png" width="30%" alt="历史数据查询"/>
+  <img src="static/94d898fea30667a511e878ad86580117.png" width="30%" alt="管理界面概览"/>
+  <img src="static/3c694294efe834c0ce00ece418af8bac.png" width="30%" alt="系统功能全景"/>
+</div>
 
 ## 🏗️ 系统架构
 
