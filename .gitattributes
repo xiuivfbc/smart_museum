@@ -1,15 +1,19 @@
 # 标记静态资源文件，降低其在语言统计中的权重
 static/* linguist-vendored
 front/* linguist-vendored
+frontend/* linguist-vendored
+Museum/* linguist-vendored
 *.html linguist-documentation
 *.css linguist-vendored
 *.scss linguist-vendored
 *.sass linguist-vendored
 *.less linguist-vendored
 *.js linguist-vendored
-*.vue linguist-vendored
-*.ts linguist-vendored
-*.tsx linguist-vendored
+
+# 完全排除 Vue 和 TypeScript 文件
+*.vue linguist-detectable=false
+*.ts linguist-detectable=false
+*.tsx linguist-detectable=false
 
 # 排除一些不必要的文件
 *.md linguist-documentation
