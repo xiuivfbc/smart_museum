@@ -1,5 +1,6 @@
 # 标记静态资源文件，降低其在语言统计中的权重
 static/* linguist-vendored
+front/* linguist-vendored
 *.html linguist-documentation
 *.css linguist-vendored
 *.scss linguist-vendored
