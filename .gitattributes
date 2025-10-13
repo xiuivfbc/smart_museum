@@ -7,6 +7,9 @@ front/* linguist-vendored
 *.sass linguist-vendored
 *.less linguist-vendored
 *.js linguist-vendored
+*.vue linguist-vendored
+*.ts linguist-vendored
+*.tsx linguist-vendored
 
 # 排除一些不必要的文件
 *.md linguist-documentation
