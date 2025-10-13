@@ -72,16 +72,17 @@ func RegisterUserService(c *gin.Context, req interface{}) {
 			return
 		}
 	}
-	if ok, _ := dao.GetActivationCode(reqStruct.Identifier); reqStruct.Role == "admin" && !ok {
-		c.JSON(http.StatusOK, gin.H{"error": "无效的管理员激活码"})
-		return
-	} else {
-		dao.DeleteActivationCode(reqStruct.Identifier)
+	// 管理员注册需要激活码验证
+	if reqStruct.Role == "admin" {
+		if ok, _ := dao.GetActivationCode(reqStruct.Identifier); !ok {
+			c.JSON(http.StatusOK, gin.H{"error": "无效的管理员激活码"})
+			return
+		}
 	}
-	if err := checkVerificationCode(c, reqStruct.Email, reqStruct.VerificationCode); err != nil {
-		c.JSON(http.StatusOK, gin.H{"error": err.Error()})
-		return
-	}
+	// if err := checkVerificationCode(c, reqStruct.Email, reqStruct.VerificationCode); err != nil {
+	// 	c.JSON(http.StatusOK, gin.H{"error": err.Error()})
+	// 	return
+	// }
 	user := model.User{
 		Username:  reqStruct.Username,
 		Password:  reqStruct.Password,
@@ -97,6 +98,8 @@ func RegisterUserService(c *gin.Context, req interface{}) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "注册成功"})
+	// 验证通过后删除激活码
+	dao.DeleteActivationCode(reqStruct.Identifier)
 }
 
 func LoginUserService(c *gin.Context, req interface{}) {
