@@ -21,14 +21,74 @@ var jwtKey []byte
 var RedisClient *redis.Client
 
 type UserClaims struct {
-	UserID   int    `json:"user_id"`
-	Username string `json:"username"`
+	UserID    int    `json:"user_id"`
+	Username  string `json:"username"`
+	Role      string `json:"role"`
+	TokenType string `json:"token_type"` // "access" 或 "refresh"
 	jwt.RegisteredClaims
+}
+
+type TokenResponse struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	ExpiresIn    int    `json:"expires_in"`
 }
 
 func InitJwtKey(key string) {
 	jwtKey = []byte(key)
-} // UserClaims 用于JWT
+}
+
+// 生成 AccessToken (短期有效，15分钟)
+func generateAccessToken(userID int, username, role string) (string, error) {
+	claims := UserClaims{
+		UserID:    userID,
+		Username:  username,
+		Role:      role,
+		TokenType: "access",
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Minute)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(jwtKey)
+}
+
+// 生成 RefreshToken (长期有效，7天)
+func generateRefreshToken(userID int, username, role string) (string, error) {
+	claims := UserClaims{
+		UserID:    userID,
+		Username:  username,
+		Role:      role,
+		TokenType: "refresh",
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(7 * 24 * time.Hour)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(jwtKey)
+}
+
+// 验证并解析 Token
+func validateToken(tokenString string, expectedType string) (*UserClaims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &UserClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if claims, ok := token.Claims.(*UserClaims); ok && token.Valid {
+		if claims.TokenType != expectedType {
+			return nil, errors.New("token type mismatch")
+		}
+		return claims, nil
+	}
+
+	return nil, errors.New("invalid token")
+}
 
 func RegisterUserService(c *gin.Context, req interface{}) {
 	reqStruct, ok := req.(struct {
@@ -126,21 +186,122 @@ func LoginUserService(c *gin.Context, req interface{}) {
 		c.JSON(http.StatusOK, gin.H{"error": "账号或密码错误"})
 		return
 	}
-	claims := UserClaims{
-		UserID:   user.ID,
-		Username: user.Username,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-		},
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtKey)
+
+	// 生成 AccessToken 和 RefreshToken
+	accessToken, err := generateAccessToken(user.ID, user.Username, user.Role)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "生成token失败"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "生成access token失败"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "登录成功", "token": tokenString, "id": user.ID, "userform": user})
+
+	refreshToken, err := generateRefreshToken(user.ID, user.Username, user.Role)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "生成refresh token失败"})
+		return
+	}
+
+	// 将 RefreshToken 存储到 Redis 中，用于后续验证
+	err = RedisClient.Set(c.Request.Context(), "refresh_token:"+string(rune(user.ID)), refreshToken, 7*24*time.Hour).Err()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "存储refresh token失败"})
+		return
+	}
+
+	tokenResponse := TokenResponse{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		ExpiresIn:    15 * 60, // 15分钟
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "登录成功",
+		"tokens":  tokenResponse,
+		"user":    user,
+	})
+}
+
+// 刷新 Token 服务
+func RefreshTokenService(c *gin.Context, req interface{}) {
+	reqStruct, ok := req.(struct {
+		RefreshToken string `json:"refresh_token"`
+	})
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "参数类型错误"})
+		return
+	}
+
+	// 验证 RefreshToken
+	claims, err := validateToken(reqStruct.RefreshToken, "refresh")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "refresh token无效"})
+		return
+	}
+
+	// 检查 RefreshToken 是否在 Redis 中存在
+	storedToken, err := RedisClient.Get(c.Request.Context(), "refresh_token:"+string(rune(claims.UserID))).Result()
+	if err != nil || storedToken != reqStruct.RefreshToken {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "refresh token已失效"})
+		return
+	}
+
+	// 生成新的 AccessToken
+	newAccessToken, err := generateAccessToken(claims.UserID, claims.Username, claims.Role)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "生成新access token失败"})
+		return
+	}
+
+	// 可选：生成新的 RefreshToken (滚动刷新)
+	newRefreshToken, err := generateRefreshToken(claims.UserID, claims.Username, claims.Role)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "生成新refresh token失败"})
+		return
+	}
+
+	// 更新 Redis 中的 RefreshToken
+	err = RedisClient.Set(c.Request.Context(), "refresh_token:"+string(rune(claims.UserID)), newRefreshToken, 7*24*time.Hour).Err()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "更新refresh token失败"})
+		return
+	}
+
+	tokenResponse := TokenResponse{
+		AccessToken:  newAccessToken,
+		RefreshToken: newRefreshToken,
+		ExpiresIn:    15 * 60,
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "token刷新成功",
+		"tokens":  tokenResponse,
+	})
+}
+
+// 登出服务 - 清除 RefreshToken
+func LogoutService(c *gin.Context, req interface{}) {
+	reqStruct, ok := req.(struct {
+		RefreshToken string `json:"refresh_token"`
+	})
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "参数类型错误"})
+		return
+	}
+
+	// 验证 RefreshToken 并获取用户信息
+	claims, err := validateToken(reqStruct.RefreshToken, "refresh")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "refresh token无效"})
+		return
+	}
+
+	// 从 Redis 中删除 RefreshToken
+	err = RedisClient.Del(c.Request.Context(), "refresh_token:"+string(rune(claims.UserID))).Err()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "登出失败"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "登出成功"})
 }
 
 func UploadUserService(c *gin.Context, req interface{}) {

@@ -19,6 +19,8 @@
 </template>
 
 <script>
+	import TokenManager from '../../utils/tokenManager.js';
+	
 	export default {
 		data() {
 			return {
@@ -57,13 +59,12 @@
 					id: userInfo.id
 				};
 
-				const [err, res] = await uni.request({
+				const [err, res] = await TokenManager.requestWithAuth({
 					url: 'http://127.0.0.1:8081/ticket/delete',
 					method: 'DELETE',
 					data: requestData,
 					header: {
-						'Content-Type': 'application/json',
-						'Authorization': `Bearer ${uni.getStorageSync("public_token").trim()}`
+						'Content-Type': 'application/json'
 					},
 					timeout: 3000
 				});

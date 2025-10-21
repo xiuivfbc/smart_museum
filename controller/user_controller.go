@@ -64,3 +64,27 @@ func GetVerificationCode(c *gin.Context) {
 	}
 	service.GetVerificationCodeService(c, req)
 }
+
+// RefreshToken 刷新token
+func RefreshToken(c *gin.Context) {
+	var req struct {
+		RefreshToken string `json:"refresh_token"`
+	}
+	if err := c.ShouldBind(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
+		return
+	}
+	service.RefreshTokenService(c, req.RefreshToken)
+}
+
+// Logout 用户登出
+func Logout(c *gin.Context) {
+	var req struct {
+		RefreshToken string `json:"refresh_token"`
+	}
+	if err := c.ShouldBind(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
+		return
+	}
+	service.LogoutService(c, req.RefreshToken)
+}

@@ -43,7 +43,8 @@ func SetupRouter() *gin.Engine {
 		user.POST("/register", controller.RegisterUser)
 		user.POST("/login", controller.LoginUser)
 		user.POST("/upload", controller.UploadUser)
-
+		user.POST("/refresh", controller.RefreshToken)
+		user.POST("/logout", controller.Logout)
 		user.POST("/verificationCode", controller.GetVerificationCode)
 	}
 

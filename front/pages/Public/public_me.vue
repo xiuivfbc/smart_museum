@@ -55,6 +55,8 @@
 
 <script>
 	import public_tabbar from '../Common/public_tabbar.vue';
+	import TokenManager from '../../utils/tokenManager.js';
+	
 	export default {
 		components: {
 			public_tabbar
@@ -73,32 +75,28 @@
 			}
 		},
 		onShow() {
-			const token = uni.getStorageSync("public_token")
-			const userInfo = uni.getStorageSync("public_user")
-			this.userform = userInfo
-			if (token) {
-				this.isLogin = true
-				this.userform = userInfo
+			const accessToken = TokenManager.getAccessToken();
+			const userInfo = uni.getStorageSync("public_user");
+			this.userform = userInfo;
+			
+			if (accessToken) {
+				this.isLogin = true;
+				this.userform = userInfo;
 			} else {
 				uni.redirectTo({
 					url: "/pages/Public/public_login"
-				})
+				});
 			}
 		},
 		methods: {
-			logout() {
-				uni.removeStorageSync("public_token")
-				uni.removeStorageSync("public_user")
-				this.isLogin = false
-
+			async logout() {
+				await TokenManager.logout();
+				this.isLogin = false;
+				
 				uni.showToast({
 					title: "已退出登录",
 					icon: "none"
-				})
-
-				uni.redirectTo({
-					url: "/pages/Public/public_login"
-				})
+				});
 			},
 			goProfileDetail() {
 				uni.navigateTo({

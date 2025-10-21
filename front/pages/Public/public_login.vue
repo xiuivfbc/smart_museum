@@ -187,11 +187,17 @@
 						data.userform.password = this.userform.password
 						this.userform = data.userform
 						
-						console.log(data.token)
+						console.log('Access Token:', data.access_token)
+						console.log('Refresh Token:', data.refresh_token)
 						
 						// 用户信息写入本地缓存
 						uni.setStorageSync("public_user", this.userform);
-						uni.setStorageSync("public_token", data.token);
+						// 分别存储两个token
+						uni.setStorageSync("access_token", data.access_token);
+						uni.setStorageSync("refresh_token", data.refresh_token);
+						
+						// 删除旧的token存储（如果存在）
+						uni.removeStorageSync("public_token");
 
 						this.loading = false;
 
